@@ -53,6 +53,23 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
     setError(null)
 
     try {
+      // Verificar se já existe uma multa com o mesmo Auto_Infracao
+      const { data: existingMulta, error: checkError } = await supabase
+        .from('Multas')
+        .select('Auto_Infracao')
+        .eq('Auto_Infracao', formData.Auto_Infracao)
+        .maybeSingle()
+
+      if (checkError) {
+        throw checkError
+      }
+
+      if (existingMulta) {
+        setError(`Já existe uma multa cadastrada com o Auto de Infração "${formData.Auto_Infracao}". O Auto de Infração deve ser único.`)
+        setLoading(false)
+        return
+      }
+
       const { error: supabaseError } = await supabase
         .from('Multas')
         .insert([{
@@ -77,15 +94,10 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
   const estadosOptions = [
     { value: '', label: 'Selecione o estado' },
-    { value: 'AC', label: 'AC' }, { value: 'AL', label: 'AL' }, { value: 'AP', label: 'AP' },
-    { value: 'AM', label: 'AM' }, { value: 'BA', label: 'BA' }, { value: 'CE', label: 'CE' },
-    { value: 'DF', label: 'DF' }, { value: 'ES', label: 'ES' }, { value: 'GO', label: 'GO' },
-    { value: 'MA', label: 'MA' }, { value: 'MT', label: 'MT' }, { value: 'MS', label: 'MS' },
-    { value: 'MG', label: 'MG' }, { value: 'PA', label: 'PA' }, { value: 'PB', label: 'PB' },
-    { value: 'PR', label: 'PR' }, { value: 'PE', label: 'PE' }, { value: 'PI', label: 'PI' },
-    { value: 'RJ', label: 'RJ' }, { value: 'RN', label: 'RN' }, { value: 'RS', label: 'RS' },
-    { value: 'RO', label: 'RO' }, { value: 'RR', label: 'RR' }, { value: 'SC', label: 'SC' },
-    { value: 'SP', label: 'SP' }, { value: 'SE', label: 'SE' }, { value: 'TO', label: 'TO' },
+    { value: 'GO', label: 'GO' },
+    { value: 'PR', label: 'PR' },
+    { value: 'SC', label: 'SC' },
+    { value: 'SP', label: 'SP' },
   ]
 
   const responsabilidadeOptions = [
