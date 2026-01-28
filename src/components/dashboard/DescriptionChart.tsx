@@ -76,13 +76,6 @@ function getStartDate(period: PeriodType): Date | null {
   }
 }
 
-// Função para truncar texto longo
-function truncateText(text: string, maxLength: number = 30): string {
-  if (!text) return 'Sem descrição'
-  if (text.length <= maxLength) return text
-  return text.substring(0, maxLength) + '...'
-}
-
 export function DescriptionChart({ multas }: DescriptionChartProps) {
   const [period, setPeriod] = useState<PeriodType>('all')
   const [chartType, setChartType] = useState<ChartType>('pie')
@@ -98,26 +91,26 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
         })
       : multas
 
-    // Agrupar por descrição
-    const descriptionCounts: Record<string, number> = {}
+    // Agrupar por código de infração
+    const codigoCounts: Record<string, number> = {}
     filtered.forEach(multa => {
-      const desc = multa.Descricao || 'Sem descrição'
-      descriptionCounts[desc] = (descriptionCounts[desc] || 0) + 1
+      const codigo = multa.Codigo_Infracao ? String(multa.Codigo_Infracao) : 'Sem código'
+      codigoCounts[codigo] = (codigoCounts[codigo] || 0) + 1
     })
 
     const total = filtered.length
 
     // Converter para array e ordenar por quantidade (decrescente)
-    const chartData = Object.entries(descriptionCounts)
+    const chartData = Object.entries(codigoCounts)
       .map(([name, value], index) => ({
-        name,
-        shortName: truncateText(name, 25),
+        name: `Cód. ${name}`,
+        shortName: `Cód. ${name}`,
         value,
         color: CHART_COLORS[index % CHART_COLORS.length],
         percent: total > 0 ? (value / total) : 0
       }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 8) // Limitar a 8 itens para melhor visualização
+      .slice(0, 10) // Limitar a 10 itens para melhor visualização
 
     return { chartData, total }
   }, [multas, period])
@@ -132,7 +125,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
-            Tipos de Infração
+            Código de Infração
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select
