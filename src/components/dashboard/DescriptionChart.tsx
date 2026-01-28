@@ -110,7 +110,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
         shortName: truncateText(name, 25),
         value,
         color: CHART_COLORS[index % CHART_COLORS.length],
-        percentage: total > 0 ? ((value / total) * 100).toFixed(1) : '0'
+        percent: total > 0 ? (value / total) : 0
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8) // Limitar a 8 itens para melhor visualização
@@ -132,14 +132,11 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select
+              options={periodOptions}
               value={period}
               onChange={(e) => setPeriod(e.target.value as PeriodType)}
               className="text-xs h-8 w-[140px]"
-            >
-              {periodOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Select>
+            />
             <div className="flex rounded-lg border border-slate-200 overflow-hidden">
               <Button
                 variant={chartType === 'pie' ? 'default' : 'ghost'}
@@ -182,7 +179,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
                 outerRadius={85}
                 paddingAngle={2}
                 dataKey="value"
-                label={({ percentage }) => `${percentage}%`}
+                label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={{ stroke: '#64748b' }}
               >
                 {chartData.map((entry, index) => (
@@ -199,23 +196,14 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
                   maxWidth: '300px'
                 }}
                 formatter={(value, _name, props) => {
-                  const fullName = props.payload?.name || ''
-                  return [`${value} multa(s)`, fullName]
+                  const fullName = (props as { payload?: { name?: string } }).payload?.name || ''
+                  return [`${value ?? 0} multa(s)`, fullName]
                 }}
               />
               <Legend 
                 verticalAlign="bottom"
-                layout="horizontal"
                 wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
-                formatter={(value, entry) => {
-                  const item = chartData.find(d => d.shortName === value)
-                  return <span style={{ color: '#0f172a' }} title={item?.name}>{value}</span>
-                }}
-                payload={chartData.map(item => ({
-                  value: item.shortName,
-                  type: 'circle' as const,
-                  color: item.color
-                }))}
+                formatter={(value: string) => <span style={{ color: '#0f172a' }}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -251,12 +239,12 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
                   maxWidth: '300px'
                 }}
                 formatter={(value, _name, props) => {
-                  const fullName = props.payload?.name || ''
-                  return [`${value} multa(s)`, fullName]
+                  const fullName = (props as { payload?: { name?: string } }).payload?.name || ''
+                  return [`${value ?? 0} multa(s)`, fullName]
                 }}
                 labelFormatter={(label) => {
-                  const item = chartData.find(d => d.shortName === label)
-                  return item?.name || label
+                  const item = chartData.find(d => d.shortName === String(label))
+                  return item?.name || String(label)
                 }}
               />
               <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={30}>

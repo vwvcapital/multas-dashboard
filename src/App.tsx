@@ -480,31 +480,6 @@ function App() {
                     />
                   </div>
                 )}
-                {loading ? (
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    {[...Array(2)].map((_, i) => (
-                      <Card key={i}>
-                        <CardContent className="p-5">
-                          <Skeleton className="h-4 w-32 mb-4" />
-                          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <MultasChart 
-                      data={multasPorStatus} 
-                      title="Multas por Status"
-                      color="#f59e0b"
-                    />
-                    <MultasChart 
-                      data={multasPorVeiculo} 
-                      title="Multas por Veículo"
-                      color="#3b82f6"
-                    />
-                  </div>
-                )}
 
                 {/* Monthly Chart */}
                 {!loading && Object.keys(multasPorMes).length > 0 && (

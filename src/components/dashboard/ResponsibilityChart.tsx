@@ -94,13 +94,13 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
           name: 'Motorista', 
           value: motorista, 
           color: COLORS.motorista,
-          percentage: total > 0 ? ((motorista / total) * 100).toFixed(1) : '0'
+          percent: total > 0 ? (motorista / total) : 0
         },
         { 
           name: 'Empresa', 
           value: empresa, 
           color: COLORS.empresa,
-          percentage: total > 0 ? ((empresa / total) * 100).toFixed(1) : '0'
+          percent: total > 0 ? (empresa / total) : 0
         },
       ].filter(item => item.value > 0),
       total,
@@ -123,14 +123,11 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select
+              options={periodOptions}
               value={period}
               onChange={(e) => setPeriod(e.target.value as PeriodType)}
               className="text-xs h-8 w-[140px]"
-            >
-              {periodOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </Select>
+            />
             <div className="flex rounded-lg border border-slate-200 overflow-hidden">
               <Button
                 variant={chartType === 'pie' ? 'default' : 'ghost'}
@@ -173,7 +170,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
                 outerRadius={100}
                 paddingAngle={3}
                 dataKey="value"
-                label={({ name, percentage }) => `${name} ${percentage}%`}
+                label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={{ stroke: '#64748b' }}
               >
                 {chartData.map((entry, index) => (
@@ -188,12 +185,12 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
                   padding: '12px 16px'
                 }}
-                formatter={(value, name) => [`${value} multa(s)`, name]}
+                formatter={(value, name) => [`${value ?? 0} multa(s)`, String(name)]}
               />
               <Legend 
                 verticalAlign="bottom" 
                 height={36}
-                formatter={(value) => <span style={{ color: '#0f172a' }}>{value}</span>}
+                formatter={(value: string) => <span style={{ color: '#0f172a' }}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -221,7 +218,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
                   padding: '12px 16px'
                 }}
-                formatter={(value) => [`${value} multa(s)`, '']}
+                formatter={(value) => [`${value ?? 0} multa(s)`, '']}
               />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={80}>
                 {chartData.map((entry, index) => (
