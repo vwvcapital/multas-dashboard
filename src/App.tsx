@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useMultas } from '@/hooks/useMultas'
 import { useLogs } from '@/hooks/useLogs'
 import { useAuth } from '@/contexts/AuthContext'
@@ -26,17 +26,23 @@ import type { Multa } from '@/lib/supabase'
 import { 
   FileWarning, 
   DollarSign, 
-  Clock, 
   Search,
   AlertCircle,
   AlertTriangle,
   List,
   LayoutGrid,
   Plus,
-  Truck
+  Truck,
+  Receipt
 } from 'lucide-react'
 
 type DisplayMode = 'list' | 'cards'
+
+// Função para converter valor string "R$ 260,32" para número
+function parseValor(valor: string): number {
+  if (!valor) return 0
+  return parseFloat(valor.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0
+}
 
 function App() {
   const { isAuthenticated, isLoading: authLoading, permissions, user } = useAuth()
@@ -212,6 +218,13 @@ function App() {
     
     return matchesSearch && matchesStatus
   })
+
+  // Calcular totais das multas filtradas
+  const filteredTotals = useMemo(() => {
+    const valorMultas = filteredMultas.reduce((acc, m) => acc + parseValor(m.Valor), 0)
+    const valorBoletos = filteredMultas.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0)
+    return { valorMultas, valorBoletos, quantidade: filteredMultas.length }
+  }, [filteredMultas])
 
   const statusOptions = [
     { value: 'todos', label: 'Todos os Status' },
@@ -404,36 +417,38 @@ function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                    <StatsCard
-                      title="Total de Multas"
-                      value={stats.total}
-                      description={`${stats.pendentes} pendentes`}
-                      icon={FileWarning}
-                      variant="default"
-                    />
-                    <StatsCard
-                      title="Valor Total"
-                      value={formatValor(stats.valorTotal)}
-                      description="Soma de todas as multas"
-                      icon={DollarSign}
-                      variant="destructive"
-                    />
-                    <StatsCard
-                      title="Boletos Pendentes"
-                      value={stats.pendentes}
-                      description={formatValor(stats.valorPendente)}
-                      icon={Clock}
-                      variant="warning"
-                    />
-                    <StatsCard
-                      title="Próx. Vencimento"
-                      value={stats.proximoVencimento}
-                      description="Vencem em 7 dias"
-                      icon={AlertTriangle}
-                      variant={stats.proximoVencimento > 0 ? "destructive" : "success"}
-                    />
-                  </div>
+                  <>
+                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                      <StatsCard
+                        title="Total de Multas"
+                        value={stats.total}
+                        description={`${stats.pendentes} pendentes`}
+                        icon={FileWarning}
+                        variant="default"
+                      />
+                      <StatsCard
+                        title="Valor das Multas"
+                        value={formatValor(stats.valorTotal)}
+                        description="Soma de todas as multas"
+                        icon={DollarSign}
+                        variant="destructive"
+                      />
+                      <StatsCard
+                        title="Valor dos Boletos"
+                        value={formatValor(stats.valorBoletoTotal)}
+                        description="Soma de todos os boletos"
+                        icon={Receipt}
+                        variant="success"
+                      />
+                      <StatsCard
+                        title="Próx. Vencimento"
+                        value={stats.proximoVencimento}
+                        description="Vencem em 7 dias"
+                        icon={AlertTriangle}
+                        variant={stats.proximoVencimento > 0 ? "destructive" : "success"}
+                      />
+                    </div>
+                  </>
                 )}
 
                 {/* Charts - Responsabilidade e Tipos de Infração */}
@@ -531,6 +546,51 @@ function App() {
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Valor dos Boletos</p>
                         <p className="text-2xl font-bold text-emerald-700">{formatValor(stats.valorBoletoVencimento)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Card de Resumo - Todas as Multas */}
+            {currentView === 'todas' && !loading && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-xl bg-slate-100">
+                        <FileWarning className="h-6 w-6 text-slate-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground font-medium">Total de Multas</p>
+                        <p className="text-2xl font-bold text-slate-700">{filteredTotals.quantidade}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-xl bg-blue-100">
+                        <DollarSign className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground font-medium">Valor das Multas</p>
+                        <p className="text-2xl font-bold text-blue-700">{formatValor(filteredTotals.valorMultas)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-xl bg-emerald-100">
+                        <Receipt className="h-6 w-6 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground font-medium">Valor dos Boletos</p>
+                        <p className="text-2xl font-bold text-emerald-700">{formatValor(filteredTotals.valorBoletos)}</p>
                       </div>
                     </div>
                   </CardContent>
