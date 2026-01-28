@@ -143,28 +143,6 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
             Código de Infração
-            <div className="relative">
-              <button
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
-                className="p-1 rounded-full hover:bg-slate-100 transition-colors"
-              >
-                <Info className="h-4 w-4 text-slate-400" />
-              </button>
-              {showTooltip && chartData.length > 0 && (
-                <div className="absolute left-0 top-8 z-50 w-72 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3">
-                  <p className="text-xs font-semibold text-slate-700 mb-2 border-b pb-2">Legenda dos Códigos:</p>
-                  <div className="space-y-1.5">
-                    {chartData.map((item) => (
-                      <div key={item.codigo} className="text-xs">
-                        <span className="font-medium text-slate-800">{item.codigo}:</span>
-                        <span className="text-slate-600 ml-1">{item.descricao}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select
@@ -194,7 +172,46 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-2">
+      <CardContent className="pt-2 relative">
+        {/* Botão de legenda no canto superior esquerdo */}
+        {chartData.length > 0 && (
+          <div className="absolute top-2 left-2 z-10">
+            <button
+              onClick={() => setShowTooltip(!showTooltip)}
+              className={`p-1.5 rounded-lg transition-colors ${showTooltip ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 hover:bg-slate-200 text-slate-500'}`}
+              title="Ver legenda dos códigos"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+            {showTooltip && (
+              <div className="absolute left-0 top-10 z-50 w-80 bg-white border border-slate-200 rounded-xl shadow-xl p-4">
+                <div className="flex items-center justify-between mb-3 border-b pb-2">
+                  <p className="text-sm font-semibold text-slate-700">Legenda dos Códigos</p>
+                  <button
+                    onClick={() => setShowTooltip(false)}
+                    className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {chartData.map((item) => (
+                    <div key={item.codigo} className="flex items-start gap-2 text-xs">
+                      <div 
+                        className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <div>
+                        <span className="font-semibold text-slate-800">{item.codigo}:</span>
+                        <span className="text-slate-600 ml-1">{item.descricao}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {total === 0 ? (
           <div className="h-[350px] flex items-center justify-center">
             <div className="text-center">
