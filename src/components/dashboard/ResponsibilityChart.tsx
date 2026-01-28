@@ -18,7 +18,7 @@ import {
 } from 'recharts'
 import type { Multa } from '@/lib/supabase'
 
-type PeriodType = 'week' | 'month' | 'quarter' | 'semester' | 'year'
+type PeriodType = 'all' | 'week' | 'month' | 'quarter' | 'semester' | 'year'
 type ChartType = 'pie' | 'bar'
 
 interface ResponsibilityChartProps {
@@ -31,6 +31,7 @@ const COLORS = {
 }
 
 const periodOptions = [
+  { value: 'all', label: 'Todos' },
   { value: 'week', label: 'Última Semana' },
   { value: 'month', label: 'Último Mês' },
   { value: 'quarter', label: 'Último Trimestre' },
@@ -47,7 +48,8 @@ function parseData(data: string): Date | null {
   return new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia))
 }
 
-function getStartDate(period: PeriodType): Date {
+function getStartDate(period: PeriodType): Date | null {
+  if (period === 'all') return null
   const now = new Date()
   switch (period) {
     case 'week':
@@ -61,22 +63,24 @@ function getStartDate(period: PeriodType): Date {
     case 'year':
       return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
     default:
-      return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+      return null
   }
 }
 
 export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
-  const [period, setPeriod] = useState<PeriodType>('month')
+  const [period, setPeriod] = useState<PeriodType>('all')
   const [chartType, setChartType] = useState<ChartType>('pie')
 
   const filteredData = useMemo(() => {
     const startDate = getStartDate(period)
     
-    const filtered = multas.filter(multa => {
-      const multaDate = parseData(multa.Data_Cometimento)
-      if (!multaDate) return false
-      return multaDate >= startDate
-    })
+    const filtered = startDate 
+      ? multas.filter(multa => {
+          const multaDate = parseData(multa.Data_Cometimento)
+          if (!multaDate) return false
+          return multaDate >= startDate
+        })
+      : multas
 
     const motorista = filtered.filter(m => 
       m.Resposabilidade?.toLowerCase() === 'motorista'
@@ -151,7 +155,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
       </CardHeader>
       <CardContent className="pt-2">
         {total === 0 ? (
-          <div className="h-[280px] flex items-center justify-center">
+          <div className="h-[350px] flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center">
                 <Users className="h-6 w-6 text-slate-400" />
@@ -160,14 +164,14 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
             </div>
           </div>
         ) : chartType === 'pie' ? (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={100}
+                innerRadius={70}
+                outerRadius={120}
                 paddingAngle={3}
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
@@ -195,7 +199,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={350}>
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
               <XAxis 

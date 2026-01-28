@@ -18,7 +18,7 @@ import {
 } from 'recharts'
 import type { Multa } from '@/lib/supabase'
 
-type PeriodType = 'week' | 'month' | 'quarter' | 'semester' | 'year'
+type PeriodType = 'all' | 'week' | 'month' | 'quarter' | 'semester' | 'year'
 type ChartType = 'pie' | 'bar'
 
 interface DescriptionChartProps {
@@ -40,6 +40,7 @@ const CHART_COLORS = [
 ]
 
 const periodOptions = [
+  { value: 'all', label: 'Todos' },
   { value: 'week', label: 'Última Semana' },
   { value: 'month', label: 'Último Mês' },
   { value: 'quarter', label: 'Último Trimestre' },
@@ -56,7 +57,8 @@ function parseData(data: string): Date | null {
   return new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia))
 }
 
-function getStartDate(period: PeriodType): Date {
+function getStartDate(period: PeriodType): Date | null {
+  if (period === 'all') return null
   const now = new Date()
   switch (period) {
     case 'week':
@@ -70,7 +72,7 @@ function getStartDate(period: PeriodType): Date {
     case 'year':
       return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
     default:
-      return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+      return null
   }
 }
 
@@ -82,17 +84,19 @@ function truncateText(text: string, maxLength: number = 30): string {
 }
 
 export function DescriptionChart({ multas }: DescriptionChartProps) {
-  const [period, setPeriod] = useState<PeriodType>('month')
+  const [period, setPeriod] = useState<PeriodType>('all')
   const [chartType, setChartType] = useState<ChartType>('pie')
 
   const filteredData = useMemo(() => {
     const startDate = getStartDate(period)
     
-    const filtered = multas.filter(multa => {
-      const multaDate = parseData(multa.Data_Cometimento)
-      if (!multaDate) return false
-      return multaDate >= startDate
-    })
+    const filtered = startDate
+      ? multas.filter(multa => {
+          const multaDate = parseData(multa.Data_Cometimento)
+          if (!multaDate) return false
+          return multaDate >= startDate
+        })
+      : multas
 
     // Agrupar por descrição
     const descriptionCounts: Record<string, number> = {}
@@ -160,7 +164,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
       </CardHeader>
       <CardContent className="pt-2">
         {total === 0 ? (
-          <div className="h-[280px] flex items-center justify-center">
+          <div className="h-[350px] flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center">
                 <FileText className="h-6 w-6 text-slate-400" />
@@ -169,14 +173,14 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
             </div>
           </div>
         ) : chartType === 'pie' ? (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={85}
+                innerRadius={60}
+                outerRadius={110}
                 paddingAngle={2}
                 dataKey="value"
                 label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
@@ -208,7 +212,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={350}>
             <BarChart 
               data={chartData} 
               layout="vertical"
