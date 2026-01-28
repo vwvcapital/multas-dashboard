@@ -34,6 +34,22 @@
   border-color: var(--color-border);
 }
 
+/* Remove focus outlines on Recharts elements */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-sector,
+.recharts-layer,
+.recharts-pie-sector,
+.recharts-bar-rectangle,
+.recharts-cell {
+  outline: none !important;
+}
+
+.recharts-wrapper *:focus,
+.recharts-wrapper *:active {
+  outline: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;

@@ -174,6 +174,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
                 outerRadius={120}
                 paddingAngle={3}
                 dataKey="value"
+                isAnimationActive={false}
                 label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={{ stroke: '#64748b' }}
               >

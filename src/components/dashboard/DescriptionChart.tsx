@@ -232,6 +232,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
                 outerRadius={110}
                 paddingAngle={2}
                 dataKey="value"
+                isAnimationActive={false}
                 label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={{ stroke: '#64748b' }}
               >
