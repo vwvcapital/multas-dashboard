@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { PieChart as PieChartIcon, BarChart3, FileText } from 'lucide-react'
+import { PieChart as PieChartIcon, BarChart3, FileText, Info } from 'lucide-react'
 import {
   PieChart,
   Pie,
@@ -79,6 +79,21 @@ function getStartDate(period: PeriodType): Date | null {
 export function DescriptionChart({ multas }: DescriptionChartProps) {
   const [period, setPeriod] = useState<PeriodType>('all')
   const [chartType, setChartType] = useState<ChartType>('pie')
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  // Criar mapa de código -> descrição
+  const codigoDescricoes = useMemo(() => {
+    const map: Record<string, string> = {}
+    multas.forEach(multa => {
+      if (multa.Codigo_Infracao && multa.Descricao) {
+        const codigo = String(multa.Codigo_Infracao)
+        if (!map[codigo]) {
+          map[codigo] = multa.Descricao
+        }
+      }
+    })
+    return map
+  }, [multas])
 
   const filteredData = useMemo(() => {
     const startDate = getStartDate(period)
@@ -102,9 +117,11 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
 
     // Converter para array e ordenar por quantidade (decrescente)
     const chartData = Object.entries(codigoCounts)
-      .map(([name, value], index) => ({
-        name: `Cód. ${name}`,
-        shortName: `Cód. ${name}`,
+      .map(([codigo, value], index) => ({
+        name: `Cód. ${codigo}`,
+        shortName: `Cód. ${codigo}`,
+        codigo,
+        descricao: codigoDescricoes[codigo] || 'Sem descrição',
         value,
         color: CHART_COLORS[index % CHART_COLORS.length],
         percent: total > 0 ? (value / total) : 0
@@ -113,7 +130,7 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
       .slice(0, 10) // Limitar a 10 itens para melhor visualização
 
     return { chartData, total }
-  }, [multas, period])
+  }, [multas, period, codigoDescricoes])
 
   const { chartData, total } = filteredData
 
@@ -126,6 +143,28 @@ export function DescriptionChart({ multas }: DescriptionChartProps) {
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
             Código de Infração
+            <div className="relative">
+              <button
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+                className="p-1 rounded-full hover:bg-slate-100 transition-colors"
+              >
+                <Info className="h-4 w-4 text-slate-400" />
+              </button>
+              {showTooltip && chartData.length > 0 && (
+                <div className="absolute left-0 top-8 z-50 w-72 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3">
+                  <p className="text-xs font-semibold text-slate-700 mb-2 border-b pb-2">Legenda dos Códigos:</p>
+                  <div className="space-y-1.5">
+                    {chartData.map((item) => (
+                      <div key={item.codigo} className="text-xs">
+                        <span className="font-medium text-slate-800">{item.codigo}:</span>
+                        <span className="text-slate-600 ml-1">{item.descricao}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select

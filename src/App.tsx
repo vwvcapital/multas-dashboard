@@ -205,7 +205,8 @@ function App() {
       (multa.Veiculo || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (multa.Motorista || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (multa.Descricao || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (multa.Auto_Infracao || '').toLowerCase().includes(searchTerm.toLowerCase())
+      (multa.Auto_Infracao || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (multa.Codigo_Infracao ? String(multa.Codigo_Infracao) : '').toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesStatus = statusFilter === 'todos' || multa.Status_Boleto === statusFilter
     
