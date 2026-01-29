@@ -220,10 +220,12 @@ function App() {
   })
 
   // Calcular totais das multas filtradas
+  // Valor dos boletos só considera multas "Disponível" (com desconto válido)
   const filteredTotals = useMemo(() => {
     const valorMultas = filteredMultas.reduce((acc, m) => acc + parseValor(m.Valor), 0)
-    const valorBoletos = filteredMultas.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0)
-    return { valorMultas, valorBoletos, quantidade: filteredMultas.length }
+    const multasDisponiveis = filteredMultas.filter(m => m.Status_Boleto === 'Disponível')
+    const valorBoletos = multasDisponiveis.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0)
+    return { valorMultas, valorBoletos, quantidade: filteredMultas.length, qtdDisponiveis: multasDisponiveis.length }
   }, [filteredMultas])
 
   const statusOptions = [
@@ -434,9 +436,9 @@ function App() {
                         variant="destructive"
                       />
                       <StatsCard
-                        title="Valor dos Boletos"
+                        title={`Boletos Disponíveis (${stats.disponiveis})`}
                         value={formatValor(stats.valorBoletoTotal)}
-                        description="Soma de todos os boletos"
+                        description="Multas com desconto válido"
                         icon={Receipt}
                         variant="success"
                       />
@@ -589,7 +591,7 @@ function App() {
                         <Receipt className="h-6 w-6 text-emerald-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground font-medium">Valor dos Boletos</p>
+                        <p className="text-sm text-muted-foreground font-medium">Boletos Disponíveis ({filteredTotals.qtdDisponiveis})</p>
                         <p className="text-2xl font-bold text-emerald-700">{formatValor(filteredTotals.valorBoletos)}</p>
                       </div>
                     </div>

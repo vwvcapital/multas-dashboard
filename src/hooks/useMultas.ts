@@ -140,7 +140,8 @@ export function useMultas(options: UseMultasOptions = {}) {
 
   // Stats baseadas nos campos reais
   const valorTotal = multas.reduce((acc, m) => acc + parseValor(m.Valor), 0)
-  const valorBoletoTotal = multas.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0)
+  // Valor dos boletos só considera multas "Disponível" (com desconto válido)
+  const valorBoletoTotal = multasDisponiveis.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0)
   
   // Multas recentes (20 últimas cadastradas, baseado no ID)
   const recentes = Math.min(multas.length, 20)
