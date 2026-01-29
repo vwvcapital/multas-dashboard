@@ -8,9 +8,9 @@ import { Sidebar, type ViewType } from '@/components/layout/Sidebar'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { MultasTable } from '@/components/dashboard/MultasTable'
 import { MultasCards } from '@/components/dashboard/MultaCard'
-import { MultasChart } from '@/components/dashboard/MultasChart'
 import { MultasPeriodChart } from '@/components/dashboard/MultasPeriodChart'
 import { StatusChartPeriod } from '@/components/dashboard/StatusChartPeriod'
+import { VehicleChart } from '@/components/dashboard/VehicleChart'
 import { ResponsibilityChart } from '@/components/dashboard/ResponsibilityChart'
 import { DescriptionChart } from '@/components/dashboard/DescriptionChart'
 import { NovaMultaForm } from '@/components/dashboard/NovaMultaForm'
@@ -60,8 +60,7 @@ function App() {
     multasProximoVencimento,
     loading, 
     error, 
-    stats, 
-    multasPorVeiculo,
+    stats,
     marcarComoPago,
     marcarComoConcluido,
     desfazerConclusao,
@@ -487,11 +486,7 @@ function App() {
                 ) : (
                   <div className="grid gap-4 lg:grid-cols-2">
                     <StatusChartPeriod multas={multas} />
-                    <MultasChart 
-                      data={multasPorVeiculo} 
-                      title="Multas por Veículo"
-                      color="#3b82f6"
-                    />
+                    <VehicleChart multas={multas} topN={10} />
                   </div>
                 )}
 
