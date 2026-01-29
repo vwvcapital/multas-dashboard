@@ -9,6 +9,8 @@ import { StatsCard } from '@/components/dashboard/StatsCard'
 import { MultasTable } from '@/components/dashboard/MultasTable'
 import { MultasCards } from '@/components/dashboard/MultaCard'
 import { MultasChart } from '@/components/dashboard/MultasChart'
+import { MultasPeriodChart } from '@/components/dashboard/MultasPeriodChart'
+import { StatusChartPeriod } from '@/components/dashboard/StatusChartPeriod'
 import { ResponsibilityChart } from '@/components/dashboard/ResponsibilityChart'
 import { DescriptionChart } from '@/components/dashboard/DescriptionChart'
 import { NovaMultaForm } from '@/components/dashboard/NovaMultaForm'
@@ -59,9 +61,7 @@ function App() {
     loading, 
     error, 
     stats, 
-    multasPorMes, 
-    multasPorVeiculo, 
-    multasPorStatus,
+    multasPorVeiculo,
     marcarComoPago,
     marcarComoConcluido,
     desfazerConclusao,
@@ -486,11 +486,7 @@ function App() {
                   </div>
                 ) : (
                   <div className="grid gap-4 lg:grid-cols-2">
-                    <MultasChart 
-                      data={multasPorStatus} 
-                      title="Multas por Status"
-                      color="#f59e0b"
-                    />
+                    <StatusChartPeriod multas={multas} />
                     <MultasChart 
                       data={multasPorVeiculo} 
                       title="Multas por Veículo"
@@ -499,13 +495,9 @@ function App() {
                   </div>
                 )}
 
-                {/* Monthly Chart */}
-                {!loading && Object.keys(multasPorMes).length > 0 && (
-                  <MultasChart 
-                    data={multasPorMes} 
-                    title="Multas por Período"
-                    color="#22c55e"
-                  />
+                {/* Monthly Chart - Linha cronológica */}
+                {!loading && multas.length > 0 && (
+                  <MultasPeriodChart multas={multas} />
                 )}
               </>
             )}
