@@ -33,6 +33,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
     Expiracao_Boleto: multa.Expiracao_Boleto || '',
     Resposabilidade: multa.Resposabilidade || 'Empresa',
     Notas: multa.Notas || '',
+    Comprovante_Pagamento: multa.Comprovante_Pagamento || '',
   })
 
   // Calcula o status automaticamente
@@ -294,6 +295,20 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
                 />
               </div>
             </div>
+
+            {(multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar' || multa.Status_Boleto === 'Pago') && (
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Link do Comprovante de Pagamento</label>
+                <Input
+                  name="Comprovante_Pagamento"
+                  value={formData.Comprovante_Pagamento}
+                  onChange={handleChange}
+                  placeholder="https://drive.google.com/..."
+                  type="url"
+                />
+                <span className="text-xs text-slate-500">Link do arquivo de comprovante (Google Drive, Dropbox, etc.)</span>
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Notas</label>

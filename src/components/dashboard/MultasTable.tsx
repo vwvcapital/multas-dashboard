@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Multa } from '@/lib/supabase'
 import type { Permissions } from '@/contexts/AuthContext'
-import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList } from 'lucide-react'
+import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt } from 'lucide-react'
 
 interface MultasTableProps {
   multas: Multa[]
@@ -166,6 +166,17 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                           >
                             <ExternalLink className="h-4 w-4" />
                           </span>
+                        ) : null}
+                        {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar') ? (
+                          <a 
+                            href={multa.Comprovante_Pagamento} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-emerald-600 hover:text-emerald-700 transition-colors"
+                            title="Ver Comprovante de Pagamento"
+                          >
+                            <Receipt className="h-4 w-4" />
+                          </a>
                         ) : null}
                       </div>
                     </TableCell>

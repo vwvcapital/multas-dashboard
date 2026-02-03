@@ -16,7 +16,8 @@ import {
   Trash2,
   CheckCircle,
   CheckCircle2,
-  Undo2
+  Undo2,
+  Receipt
 } from 'lucide-react'
 
 interface MultaCardProps {
@@ -159,6 +160,17 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                 <ExternalLink className="h-3.5 w-3.5" />
                 Consultar
               </span>
+            ) : null}
+            {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar') ? (
+              <a 
+                href={multa.Comprovante_Pagamento} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+              >
+                <Receipt className="h-3.5 w-3.5" />
+                Comprovante
+              </a>
             ) : null}
           </div>
           
