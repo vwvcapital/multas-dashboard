@@ -113,8 +113,9 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
         </div>
 
         {/* Links e Ações */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-slate-100">
+          {/* Links */}
+          <div className="flex items-center gap-3 flex-wrap">
             {multa.Boleto && multa.Status_Boleto !== 'Vencido' && canAccessBoleto ? (
               <a 
                 href={multa.Boleto} 
@@ -175,7 +176,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
           </div>
           
           {showActions && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {onMarkAsPaid && multa.Status_Boleto === 'Disponível' && canMarkAsPaid && (
                 <Button
                   variant="outline"
@@ -238,24 +239,24 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
               )}
               {onEdit && canEdit && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-8 w-8 text-slate-500 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                   onClick={() => onEdit(multa)}
                   title="Editar"
                 >
-                  <Pencil className="h-3.5 w-3.5 text-slate-500" />
+                  <Pencil className="h-3.5 w-3.5" />
                 </Button>
               )}
               {onDelete && canDelete && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-8 w-8 text-red-500 border-red-200 hover:bg-red-50 hover:border-red-300"
                   onClick={() => onDelete(multa)}
                   title="Excluir"
                 >
-                  <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>

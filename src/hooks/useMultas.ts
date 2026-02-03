@@ -279,12 +279,38 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas])
 
-  // Função para RH desfazer conclusão (voltar para Descontar)
+  // Função para RH desfazer conclusão (voltar para Descontar ou Disponível baseado na responsabilidade)
   const desfazerConclusao = useCallback(async (multaId: number) => {
     try {
+      // Buscar a multa para verificar responsabilidade
+      const multa = multas.find(m => m.id === multaId)
+      if (!multa) {
+        console.error('Multa não encontrada:', multaId)
+        return false
+      }
+
+      // Determinar para qual status voltar baseado na responsabilidade
+      // - Empresa: volta para Disponível (pois foi de Disponível -> Concluído)
+      // - Motorista: volta para Descontar (pois foi de Descontar -> Concluído)
+      let novoStatus = 'Descontar'
+      const responsabilidade = multa.Resposabilidade?.toLowerCase()?.trim()
+      
+      if (responsabilidade === 'empresa') {
+        // Empresa: recalcular o status baseado nos dados do boleto
+        const { calcularStatusBoleto } = await import('@/lib/utils')
+        novoStatus = calcularStatusBoleto({
+          pago: false,
+          concluido: false,
+          linkBoleto: multa.Boleto || '',
+          dataVencimento: multa.Expiracao_Boleto || '',
+        })
+      }
+
+      console.log('Desfazendo conclusão:', { multaId, responsabilidade, novoStatus })
+
       const { error: supabaseError } = await supabase
         .from('Multas')
-        .update({ Status_Boleto: 'Descontar' })
+        .update({ Status_Boleto: novoStatus })
         .eq('id', multaId)
 
       if (supabaseError) {
@@ -299,7 +325,7 @@ export function useMultas(options: UseMultasOptions = {}) {
       console.error('Erro ao desfazer conclusão:', err)
       return false
     }
-  }, [fetchMultas])
+  }, [fetchMultas, multas])
 
   const multasPorMes = multas.reduce((acc, multa) => {
     const data = parseData(multa.Data_Cometimento)
