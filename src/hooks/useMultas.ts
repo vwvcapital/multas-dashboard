@@ -166,7 +166,7 @@ export function useMultas(options: UseMultasOptions = {}) {
   // Função para marcar multa como paga
   // Se responsabilidade é da Empresa, marca automaticamente como Concluído
   // Se responsabilidade é do Motorista, marca como Descontar (para RH processar)
-  const marcarComoPago = useCallback(async (multaId: number) => {
+  const marcarComoPago = useCallback(async (multaId: number, comprovantePagamento?: string) => {
     try {
       // Buscar a multa para verificar responsabilidade
       const multa = multas.find(m => m.id === multaId)
@@ -192,9 +192,17 @@ export function useMultas(options: UseMultasOptions = {}) {
       
       console.log('Novo status:', novoStatus)
 
+      const updateData: { Status_Boleto: string; Comprovante_Pagamento?: string } = { 
+        Status_Boleto: novoStatus 
+      }
+      
+      if (comprovantePagamento) {
+        updateData.Comprovante_Pagamento = comprovantePagamento
+      }
+
       const { error: supabaseError, data } = await supabase
         .from('Multas')
-        .update({ Status_Boleto: novoStatus })
+        .update(updateData)
         .eq('id', multaId)
         .select()
 

@@ -16,6 +16,7 @@ import { DescriptionChart } from '@/components/dashboard/DescriptionChart'
 import { NovaMultaForm } from '@/components/dashboard/NovaMultaForm'
 import { EditMultaForm } from '@/components/dashboard/EditMultaForm'
 import { DeleteMultaDialog } from '@/components/dashboard/DeleteMultaDialog'
+import { PagarMultaDialog } from '@/components/dashboard/PagarMultaDialog'
 import { MultaDetailsModal } from '@/components/dashboard/MultaDetailsModal'
 import { LogsModal } from '@/components/dashboard/LogsModal'
 import { Input } from '@/components/ui/input'
@@ -81,20 +82,26 @@ function App() {
   const [editingMulta, setEditingMulta] = useState<Multa | null>(null)
   const [deletingMulta, setDeletingMulta] = useState<Multa | null>(null)
   const [viewingMulta, setViewingMulta] = useState<Multa | null>(null)
+  const [payingMulta, setPayingMulta] = useState<Multa | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showLogsModal, setShowLogsModal] = useState(false)
 
   // Funções wrapper para ações com logs
-  const handleMarcarComoPago = async (multa: Multa) => {
-    const success = await marcarComoPago(multa.id)
+  const handleMarcarComoPago = (multa: Multa) => {
+    // Abre o dialog para inserir o comprovante
+    setPayingMulta(multa)
+  }
+
+  const handleConfirmarPagamento = async (multa: Multa, comprovante: string) => {
+    const success = await marcarComoPago(multa.id, comprovante)
     if (success) {
       await registrarLog({
         action: 'marcar_pago',
         entityId: multa.id,
         entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
-        details: { motorista: multa.Motorista, valor: multa.Valor_Boleto },
+        details: { motorista: multa.Motorista, valor: multa.Valor_Boleto, comprovante },
       })
     }
   }
@@ -338,6 +345,15 @@ function App() {
           multa={deletingMulta}
           onClose={() => setDeletingMulta(null)} 
           onSuccess={handleDeleteMultaSuccess} 
+        />
+      )}
+
+      {/* Modal Pagar Multa */}
+      {payingMulta && (
+        <PagarMultaDialog 
+          multa={payingMulta}
+          onClose={() => setPayingMulta(null)} 
+          onConfirm={handleConfirmarPagamento} 
         />
       )}
 
