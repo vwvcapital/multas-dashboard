@@ -230,8 +230,8 @@ function App() {
         return sorted.sort((a, b) => parseValor(a.Valor_Boleto || a.Valor) - parseValor(b.Valor_Boleto || b.Valor))
       case 'vencimento':
         return sorted.sort((a, b) => {
-          const dateA = a.Vencimento_Boleto ? new Date(a.Vencimento_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
-          const dateB = b.Vencimento_Boleto ? new Date(b.Vencimento_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
+          const dateA = a.Expiracao_Boleto ? new Date(a.Expiracao_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
+          const dateB = b.Expiracao_Boleto ? new Date(b.Expiracao_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
           return dateA.getTime() - dateB.getTime()
         })
       case 'veiculo':
