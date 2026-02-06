@@ -36,10 +36,12 @@ import {
   LayoutGrid,
   Plus,
   Truck,
-  Receipt
+  Receipt,
+  ArrowUpDown
 } from 'lucide-react'
 
 type DisplayMode = 'list' | 'cards'
+type SortOption = 'recente' | 'antiga' | 'valor-maior' | 'valor-menor' | 'vencimento' | 'veiculo' | 'motorista'
 
 // Função para converter valor string "R$ 260,32" para número
 function parseValor(valor: string): number {
@@ -85,6 +87,7 @@ function App() {
   const [payingMulta, setPayingMulta] = useState<Multa | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
+  const [sortOption, setSortOption] = useState<SortOption>('recente')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showLogsModal, setShowLogsModal] = useState(false)
 
@@ -212,6 +215,34 @@ function App() {
 
   const multasToShow = getMultasForView()
 
+  // Função para ordenar multas
+  const sortMultas = (multasToSort: Multa[]): Multa[] => {
+    const sorted = [...multasToSort]
+    
+    switch (sortOption) {
+      case 'recente':
+        return sorted.sort((a, b) => b.id - a.id)
+      case 'antiga':
+        return sorted.sort((a, b) => a.id - b.id)
+      case 'valor-maior':
+        return sorted.sort((a, b) => parseValor(b.Valor_Boleto || b.Valor) - parseValor(a.Valor_Boleto || a.Valor))
+      case 'valor-menor':
+        return sorted.sort((a, b) => parseValor(a.Valor_Boleto || a.Valor) - parseValor(b.Valor_Boleto || b.Valor))
+      case 'vencimento':
+        return sorted.sort((a, b) => {
+          const dateA = a.Vencimento_Boleto ? new Date(a.Vencimento_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
+          const dateB = b.Vencimento_Boleto ? new Date(b.Vencimento_Boleto.split('/').reverse().join('-')) : new Date('9999-12-31')
+          return dateA.getTime() - dateB.getTime()
+        })
+      case 'veiculo':
+        return sorted.sort((a, b) => (a.Veiculo || '').localeCompare(b.Veiculo || ''))
+      case 'motorista':
+        return sorted.sort((a, b) => (a.Motorista || '').localeCompare(b.Motorista || ''))
+      default:
+        return sorted
+    }
+  }
+
   const filteredMultas = multasToShow.filter(multa => {
     const matchesSearch = 
       (multa.Veiculo || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,6 +255,9 @@ function App() {
     
     return matchesSearch && matchesStatus
   })
+
+  // Aplicar ordenação às multas filtradas
+  const sortedFilteredMultas = useMemo(() => sortMultas(filteredMultas), [filteredMultas, sortOption])
 
   // Calcular totais das multas filtradas
   // Valor dos boletos só considera multas "Disponível" (com desconto válido)
@@ -241,6 +275,16 @@ function App() {
     { value: 'Descontar', label: 'À Descontar' },
     { value: 'Concluído', label: 'Concluídos' },
     { value: 'Vencido', label: 'Vencidos' },
+  ]
+
+  const sortOptions = [
+    { value: 'recente', label: 'Mais recentes' },
+    { value: 'antiga', label: 'Mais antigas' },
+    { value: 'valor-maior', label: 'Maior valor' },
+    { value: 'valor-menor', label: 'Menor valor' },
+    { value: 'vencimento', label: 'Vencimento próximo' },
+    { value: 'veiculo', label: 'Veículo (A-Z)' },
+    { value: 'motorista', label: 'Motorista (A-Z)' },
   ]
 
   // Formatar valores para exibição
@@ -626,6 +670,17 @@ function App() {
                     />
                   )}
                   
+                  {/* Sort Select */}
+                  <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2">
+                    <ArrowUpDown className="h-4 w-4 text-slate-400" />
+                    <Select
+                      options={sortOptions}
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value as SortOption)}
+                      className="border-0 bg-transparent w-36 sm:w-40"
+                    />
+                  </div>
+                  
                   {/* Toggle View Mode */}
                   <div className="flex items-center bg-white border-2 border-slate-200 rounded-xl overflow-hidden">
                     <button
@@ -672,8 +727,8 @@ function App() {
                 <div className="overflow-x-auto -mx-4 sm:mx-0">
                   <div className="min-w-[800px] sm:min-w-0 px-4 sm:px-0">
                     <MultasTable 
-                      multas={filteredMultas} 
-                      title={`${viewTitles[currentView].title} (${filteredMultas.length})`}
+                      multas={sortedFilteredMultas} 
+                      title={`${viewTitles[currentView].title} (${sortedFilteredMultas.length})`}
                       onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
                       onEdit={permissions.canEdit ? setEditingMulta : undefined}
                       onDelete={permissions.canDelete ? setDeletingMulta : undefined}
@@ -689,10 +744,10 @@ function App() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4 text-slate-800">
                     {viewTitles[currentView].title} 
-                    <span className="text-muted-foreground font-normal ml-2">({filteredMultas.length})</span>
+                    <span className="text-muted-foreground font-normal ml-2">({sortedFilteredMultas.length})</span>
                   </h3>
                   <MultasCards 
-                    multas={filteredMultas}
+                    multas={sortedFilteredMultas}
                     onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
                     onEdit={permissions.canEdit ? setEditingMulta : undefined}
                     onDelete={permissions.canDelete ? setDeletingMulta : undefined}
