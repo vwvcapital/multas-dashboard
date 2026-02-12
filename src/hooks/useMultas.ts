@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase, type Multa } from '@/lib/supabase'
-import { calcularStatusBoleto } from '@/lib/utils'
+import { calcularStatusBoleto, calcularStatusIndicacao } from '@/lib/utils'
 import type { UserRole } from '@/contexts/AuthContext'
 
 // Função para converter valor string "R$ 260,32" para número
@@ -32,6 +32,20 @@ function recalcularStatusBoleto(multa: Multa): Multa {
   return { ...multa, Status_Boleto: statusCalculado }
 }
 
+// Função para recalcular o status de indicação de cada multa
+function recalcularStatusIndicacao(multa: Multa): Multa {
+  // Se já está indicado, não recalcular
+  if (multa.Status_Indicacao === 'Indicado') {
+    return multa
+  }
+
+  const statusCalculado = calcularStatusIndicacao({
+    indicado: false,
+    dataExpiracao: multa.Expiracao_Indicacao || '',
+  })
+  return { ...multa, Status_Indicacao: statusCalculado || undefined }
+}
+
 interface UseMultasOptions {
   userRole?: UserRole
 }
@@ -57,7 +71,7 @@ export function useMultas(options: UseMultasOptions = {}) {
         setAllMultas([])
       } else {
         // Recalcula o status de cada multa ao carregar
-        const multasRecalculadas = ((data as Multa[]) || []).map(recalcularStatusBoleto)
+        const multasRecalculadas = ((data as Multa[]) || []).map(recalcularStatusBoleto).map(recalcularStatusIndicacao)
         setAllMultas(multasRecalculadas)
       }
     } catch (err) {
@@ -118,6 +132,24 @@ export function useMultas(options: UseMultasOptions = {}) {
     [multas]
   )
 
+  // Multas com indicação pendente (Faltando Indicar)
+  const multasFaltandoIndicar = useMemo(() => 
+    multas.filter(m => m.Status_Indicacao === 'Faltando Indicar'), 
+    [multas]
+  )
+
+  // Multas com indicação expirada
+  const multasIndicacaoExpirada = useMemo(() => 
+    multas.filter(m => m.Status_Indicacao === 'Indicar Expirado'), 
+    [multas]
+  )
+
+  // Multas já indicadas
+  const multasIndicadas = useMemo(() => 
+    multas.filter(m => m.Status_Indicacao === 'Indicado'), 
+    [multas]
+  )
+
   // Multas próximas do vencimento (7 dias) - inclui Pendente e Disponível
   // Ordenadas por data de vencimento (mais próxima primeiro)
   const multasProximoVencimento = useMemo(() => {
@@ -156,6 +188,9 @@ export function useMultas(options: UseMultasOptions = {}) {
     pagosMotorista: multasPagasMotorista.length,
     vencidos: multasVencidas.length,
     proximoVencimento: multasProximoVencimento.length,
+    faltandoIndicar: multasFaltandoIndicar.length,
+    indicacaoExpirada: multasIndicacaoExpirada.length,
+    indicadas: multasIndicadas.length,
     valorTotal,
     valorBoletoTotal,
     valorPendente: multasPendentes.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0),
@@ -327,6 +362,56 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas, multas])
 
+  // Função para marcar multa como indicada (real infrator indicado no SENATRAN)
+  const indicarMotorista = useCallback(async (multaId: number) => {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('Multas')
+        .update({ Status_Indicacao: 'Indicado' })
+        .eq('id', multaId)
+
+      if (supabaseError) {
+        console.error('Erro ao indicar motorista:', supabaseError)
+        return false
+      }
+
+      await fetchMultas()
+      return true
+    } catch (err) {
+      console.error('Erro ao indicar motorista:', err)
+      return false
+    }
+  }, [fetchMultas])
+
+  // Função para desfazer indicação (voltar para Faltando Indicar ou Indicar Expirado)
+  const desfazerIndicacao = useCallback(async (multaId: number) => {
+    try {
+      const multa = multas.find(m => m.id === multaId)
+      if (!multa) return false
+
+      const novoStatus = calcularStatusIndicacao({
+        indicado: false,
+        dataExpiracao: multa.Expiracao_Indicacao || '',
+      })
+
+      const { error: supabaseError } = await supabase
+        .from('Multas')
+        .update({ Status_Indicacao: novoStatus })
+        .eq('id', multaId)
+
+      if (supabaseError) {
+        console.error('Erro ao desfazer indicação:', supabaseError)
+        return false
+      }
+
+      await fetchMultas()
+      return true
+    } catch (err) {
+      console.error('Erro ao desfazer indicação:', err)
+      return false
+    }
+  }, [fetchMultas, multas])
+
   const multasPorMes = multas.reduce((acc, multa) => {
     const data = parseData(multa.Data_Cometimento)
     if (data) {
@@ -358,6 +443,9 @@ export function useMultas(options: UseMultasOptions = {}) {
     multasPagasMotorista,
     multasVencidas,
     multasProximoVencimento,
+    multasFaltandoIndicar,
+    multasIndicacaoExpirada,
+    multasIndicadas,
     loading,
     error,
     stats,
@@ -368,6 +456,8 @@ export function useMultas(options: UseMultasOptions = {}) {
     marcarComoConcluido,
     desfazerConclusao,
     desmarcarPagamento,
+    indicarMotorista,
+    desfazerIndicacao,
     refetch: fetchMultas
   }
 }

@@ -72,3 +72,44 @@ export function calcularStatusBoleto(params: {
   // Caso contrário, pendente
   return 'Pendente'
 }
+
+/**
+ * Calcula automaticamente o Status_Indicacao baseado nas regras:
+ * - Indicado: quando já foi indicado manualmente
+ * - Indicar Expirado: quando a data limite para indicar já passou
+ * - Faltando Indicar: quando tem data de expiração mas ainda não foi indicado
+ * - null: quando não tem data de expiração definida
+ */
+export function calcularStatusIndicacao(params: {
+  indicado: boolean
+  dataExpiracao: string
+}): 'Faltando Indicar' | 'Indicado' | 'Indicar Expirado' | null {
+  const { indicado, dataExpiracao } = params
+
+  // Se já foi indicado, retorna Indicado
+  if (indicado) {
+    return 'Indicado'
+  }
+
+  // Se não tem data de expiração, não há indicação a fazer
+  if (!dataExpiracao || dataExpiracao.trim() === '') {
+    return null
+  }
+
+  // Verificar se a data de expiração já passou
+  const hoje = new Date()
+  hoje.setHours(0, 0, 0, 0)
+
+  const partes = dataExpiracao.split('/')
+  if (partes.length === 3) {
+    const [dia, mes, ano] = partes.map(p => parseInt(p, 10))
+    const dataExp = new Date(ano, mes - 1, dia)
+    dataExp.setHours(0, 0, 0, 0)
+
+    if (dataExp < hoje) {
+      return 'Indicar Expirado'
+    }
+  }
+
+  return 'Faltando Indicar'
+}

@@ -29,4 +29,6 @@ export type Multa = {
   Resposabilidade: string
   Notas: string
   Comprovante_Pagamento?: string
+  Status_Indicacao?: string
+  Expiracao_Indicacao?: string
 }

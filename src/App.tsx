@@ -61,6 +61,9 @@ function App() {
     multasPagasMotorista,
     multasVencidas,
     multasProximoVencimento,
+    multasFaltandoIndicar,
+    multasIndicacaoExpirada,
+    multasIndicadas,
     loading, 
     error, 
     stats,
@@ -68,6 +71,8 @@ function App() {
     marcarComoConcluido,
     desfazerConclusao,
     desmarcarPagamento,
+    indicarMotorista,
+    desfazerIndicacao,
     refetch 
   } = useMultas({ userRole: user?.role })
 
@@ -139,6 +144,30 @@ function App() {
         action: 'desfazer_conclusao',
         entityId: multa.id,
         entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+      })
+    }
+  }
+
+  const handleIndicarMotorista = async (multa: Multa) => {
+    const success = await indicarMotorista(multa.id)
+    if (success) {
+      await registrarLog({
+        action: 'indicar_motorista',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { motorista: multa.Motorista },
+      })
+    }
+  }
+
+  const handleDesfazerIndicacao = async (multa: Multa) => {
+    const success = await desfazerIndicacao(multa.id)
+    if (success) {
+      await registrarLog({
+        action: 'desfazer_indicacao',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { motorista: multa.Motorista },
       })
     }
   }
@@ -736,6 +765,8 @@ function App() {
                       onUnmarkAsPaid={permissions.canMarkAsPaid ? handleDesmarcarPagamento : undefined}
                       onMarkAsComplete={permissions.canMarkAsComplete ? handleMarcarComoConcluido : undefined}
                       onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
+                      onIndicar={permissions.canEdit ? handleIndicarMotorista : undefined}
+                      onDesfazerIndicacao={permissions.canEdit ? handleDesfazerIndicacao : undefined}
                       permissions={permissions}
                     />
                   </div>
@@ -755,6 +786,8 @@ function App() {
                     onUnmarkAsPaid={permissions.canMarkAsPaid ? handleDesmarcarPagamento : undefined}
                     onMarkAsComplete={permissions.canMarkAsComplete ? handleMarcarComoConcluido : undefined}
                     onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
+                    onIndicar={permissions.canEdit ? handleIndicarMotorista : undefined}
+                    onDesfazerIndicacao={permissions.canEdit ? handleDesfazerIndicacao : undefined}
                     permissions={permissions}
                   />
                 </div>

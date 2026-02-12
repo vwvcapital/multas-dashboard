@@ -15,7 +15,8 @@ import {
   Hash,
   AlertCircle,
   Building,
-  Receipt
+  Receipt,
+  UserPlus
 } from 'lucide-react'
 
 interface MultaDetailsModalProps {
@@ -29,6 +30,12 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Descontar': { label: 'À Descontar', variant: 'purple' },
   'Concluído': { label: 'Concluído', variant: 'success' },
   'Vencido': { label: 'Vencido', variant: 'destructive' },
+}
+
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+  'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
+  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
 }
 
 export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
@@ -70,6 +77,15 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
               <span className="text-sm text-muted-foreground">Status:</span>
               <Badge variant={statusBoleto.variant}>{statusBoleto.label}</Badge>
             </div>
+            {multa.Status_Indicacao && (() => {
+              const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
+              return (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Indicação:</span>
+                  <Badge variant={statusInd.variant}>{statusInd.label}</Badge>
+                </div>
+              )
+            })()}
           </div>
 
           {/* Veículo e Motorista */}
@@ -130,6 +146,43 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
               </div>
             </div>
           </div>
+
+          {/* Indicação de Real Infrator */}
+          {multa.Expiracao_Indicacao && (
+            <div className={`border rounded-xl p-5 ${
+              multa.Status_Indicacao === 'Indicado' ? 'bg-cyan-50 border-cyan-100' :
+              multa.Status_Indicacao === 'Indicar Expirado' ? 'bg-red-50 border-red-100' :
+              'bg-amber-50 border-amber-100'
+            }`}>
+              <div className="flex items-center gap-2 mb-3">
+                <UserPlus className={`h-5 w-5 ${
+                  multa.Status_Indicacao === 'Indicado' ? 'text-cyan-500' :
+                  multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-500' :
+                  'text-amber-500'
+                }`} />
+                <span className={`font-semibold ${
+                  multa.Status_Indicacao === 'Indicado' ? 'text-cyan-700' :
+                  multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-700' :
+                  'text-amber-700'
+                }`}>Indicação de Real Infrator (SENATRAN)</span>
+                {multa.Status_Indicacao && (() => {
+                  const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
+                  return (
+                    <Badge variant={statusInd.variant} className="ml-auto">
+                      {statusInd.label}
+                    </Badge>
+                  )
+                })()}
+              </div>
+              <p className={`text-sm ${
+                multa.Status_Indicacao === 'Indicado' ? 'text-cyan-800' :
+                multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-800' :
+                'text-amber-800'
+              }`}>
+                Prazo para indicação: <span className="font-semibold">{multa.Expiracao_Indicacao}</span>
+              </p>
+            </div>
+          )}
 
           {/* Descrição da Infração */}
           <div className="bg-red-50 border border-red-100 rounded-xl p-5">

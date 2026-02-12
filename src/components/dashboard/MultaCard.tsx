@@ -17,7 +17,8 @@ import {
   CheckCircle,
   CheckCircle2,
   Undo2,
-  Receipt
+  Receipt,
+  UserPlus
 } from 'lucide-react'
 
 interface MultaCardProps {
@@ -29,6 +30,8 @@ interface MultaCardProps {
   onUnmarkAsPaid?: (multa: Multa) => void
   onMarkAsComplete?: (multa: Multa) => void
   onUndoComplete?: (multa: Multa) => void
+  onIndicar?: (multa: Multa) => void
+  onDesfazerIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
@@ -41,9 +44,15 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
-export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, permissions }: MultaCardProps) {
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+  'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
+  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
+}
+
+export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultaCardProps) {
   const statusBoleto = statusBoletoConfig[multa.Status_Boleto] || { label: multa.Status_Boleto || '-', variant: 'secondary' as const }
-  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete
+  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao
   
   // Permissões com fallback para true (comportamento padrão)
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
@@ -70,9 +79,19 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
               <Badge variant="outline" className="shrink-0 text-[10px] px-2">{multa.Estado}</Badge>
             </div>
           </div>
-          <Badge variant={statusBoleto.variant} className="shrink-0">
-            {statusBoleto.label}
-          </Badge>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <Badge variant={statusBoleto.variant}>
+              {statusBoleto.label}
+            </Badge>
+            {multa.Status_Indicacao && (() => {
+              const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
+              return (
+                <Badge variant={statusInd.variant} className="text-[10px]">
+                  {statusInd.label}
+                </Badge>
+              )
+            })()}
+          </div>
         </div>
 
         {/* Descrição */}
@@ -225,6 +244,30 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Desfazer</span>
                 </Button>
               )}
+              {onIndicar && multa.Status_Indicacao === 'Faltando Indicar' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 text-xs text-cyan-600 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300"
+                  onClick={() => onIndicar(multa)}
+                  title="Indicar Real Infrator"
+                >
+                  <UserPlus className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Indicar</span>
+                </Button>
+              )}
+              {onDesfazerIndicacao && multa.Status_Indicacao === 'Indicado' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 text-xs text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
+                  onClick={() => onDesfazerIndicacao(multa)}
+                  title="Desfazer Indicação"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Desfazer</span>
+                </Button>
+              )}
               {onViewDetails && (
                 <Button
                   variant="default"
@@ -276,10 +319,12 @@ interface MultasCardsProps {
   onUnmarkAsPaid?: (multa: Multa) => void
   onMarkAsComplete?: (multa: Multa) => void
   onUndoComplete?: (multa: Multa) => void
+  onIndicar?: (multa: Multa) => void
+  onDesfazerIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
-export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, permissions }: MultasCardsProps) {
+export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultasCardsProps) {
   if (multas.length === 0) {
     return (
       <div className="text-center py-16">
@@ -305,6 +350,8 @@ export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsP
           onUnmarkAsPaid={onUnmarkAsPaid}
           onMarkAsComplete={onMarkAsComplete}
           onUndoComplete={onUndoComplete}
+          onIndicar={onIndicar}
+          onDesfazerIndicacao={onDesfazerIndicacao}
           permissions={permissions}
         />
       ))}

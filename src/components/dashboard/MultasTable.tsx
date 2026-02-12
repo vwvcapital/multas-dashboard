@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Multa } from '@/lib/supabase'
 import type { Permissions } from '@/contexts/AuthContext'
-import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt } from 'lucide-react'
+import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt, UserPlus, UserCheck } from 'lucide-react'
 
 interface MultasTableProps {
   multas: Multa[]
@@ -23,6 +23,8 @@ interface MultasTableProps {
   onUnmarkAsPaid?: (multa: Multa) => void
   onMarkAsComplete?: (multa: Multa) => void
   onUndoComplete?: (multa: Multa) => void
+  onIndicar?: (multa: Multa) => void
+  onDesfazerIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
@@ -35,8 +37,14 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
-export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, permissions }: MultasTableProps) {
-  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+  'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
+  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
+}
+
+export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultasTableProps) {
+  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
   const canAccessConsulta = permissions?.canAccessConsulta ?? true
   const canMarkAsComplete = permissions?.canMarkAsComplete ?? true
@@ -65,6 +73,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                 <TableHead className="text-right font-semibold text-slate-700">Valor</TableHead>
                 <TableHead className="text-right font-semibold text-slate-700">Valor Boleto</TableHead>
                 <TableHead className="text-center font-semibold text-slate-700">Status</TableHead>
+                <TableHead className="text-center font-semibold text-slate-700">Indicação</TableHead>
                 <TableHead className="text-center font-semibold text-slate-700">Links</TableHead>
                 {showActions && <TableHead className="text-center font-semibold text-slate-700">Ações</TableHead>}
               </TableRow>
@@ -72,7 +81,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
             <TableBody>
             {multas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={showActions ? 11 : 10} className="text-center py-12">
+                <TableCell colSpan={showActions ? 12 : 11} className="text-center py-12">
                   <div className="flex flex-col items-center">
                     <div className="w-12 h-12 mb-3 rounded-xl bg-slate-100 flex items-center justify-center">
                       <FileText className="h-6 w-6 text-slate-400" />
@@ -121,6 +130,18 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                       <Badge variant={statusBoleto.variant}>
                         {statusBoleto.label}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {multa.Status_Indicacao ? (() => {
+                        const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
+                        return (
+                          <Badge variant={statusInd.variant} className="text-[10px]">
+                            {statusInd.label}
+                          </Badge>
+                        )
+                      })() : (
+                        <span className="text-xs text-slate-400">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 justify-center">
@@ -226,6 +247,30 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               className="h-8 px-3 gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50 hover:border-amber-300"
                               onClick={() => onUnmarkAsPaid(multa)}
                               title="Desfazer - Voltar para Disponível"
+                            >
+                              <Undo2 className="h-4 w-4" />
+                              <span className="hidden xl:inline">Desfazer</span>
+                            </Button>
+                          )}
+                          {onIndicar && multa.Status_Indicacao === 'Faltando Indicar' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 gap-1.5 text-cyan-600 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300"
+                              onClick={() => onIndicar(multa)}
+                              title="Indicar Real Infrator"
+                            >
+                              <UserPlus className="h-4 w-4" />
+                              <span className="hidden xl:inline">Indicar</span>
+                            </Button>
+                          )}
+                          {onDesfazerIndicacao && multa.Status_Indicacao === 'Indicado' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
+                              onClick={() => onDesfazerIndicacao(multa)}
+                              title="Desfazer Indicação"
                             >
                               <Undo2 className="h-4 w-4" />
                               <span className="hidden xl:inline">Desfazer</span>

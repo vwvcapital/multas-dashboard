@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
-import { calcularStatusBoleto } from '@/lib/utils'
+import { calcularStatusBoleto, calcularStatusIndicacao } from '@/lib/utils'
 import { X, Plus, Loader2, AlertCircle } from 'lucide-react'
 
 interface NovaMultaFormProps {
@@ -32,6 +32,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
     Expiracao_Boleto: '',
     Resposabilidade: 'Empresa',
     Notas: '',
+    Expiracao_Indicacao: '',
   })
 
   // Calcula o status automaticamente
@@ -40,6 +41,12 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
     concluido: false,
     linkBoleto: formData.Boleto,
     dataVencimento: formData.Expiracao_Boleto,
+  })
+
+  // Calcula o status de indicação automaticamente
+  const statusIndicacaoCalculado = calcularStatusIndicacao({
+    indicado: false,
+    dataExpiracao: formData.Expiracao_Indicacao,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -75,6 +82,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
         .insert([{
           ...formData,
           Status_Boleto: statusBoletoCalculado,
+          Status_Indicacao: statusIndicacaoCalculado,
           Codigo_Infracao: formData.Codigo_Infracao ? parseInt(formData.Codigo_Infracao) : null,
         }])
 
@@ -279,6 +287,32 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                   onChange={handleChange}
                   options={responsabilidadeOptions}
                 />
+              </div>
+            </div>
+
+            {/* Indicação de Real Infrator */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Prazo p/ Indicação (SENATRAN)</label>
+                <Input
+                  name="Expiracao_Indicacao"
+                  value={formData.Expiracao_Indicacao}
+                  onChange={handleChange}
+                  placeholder="DD/MM/AAAA"
+                />
+                <span className="text-xs text-slate-500">Data limite para indicar o real infrator</span>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Status Indicação</label>
+                <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
+                  statusIndicacaoCalculado === 'Indicado' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' :
+                  statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
+                  statusIndicacaoCalculado === 'Faltando Indicar' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                  'bg-slate-50 text-slate-400 border-slate-200'
+                }`}>
+                  {statusIndicacaoCalculado || 'Sem indicação'}
+                </div>
+                <span className="text-xs text-slate-500">Calculado automaticamente</span>
               </div>
             </div>
 

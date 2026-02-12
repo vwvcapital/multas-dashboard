@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase, type Multa } from '@/lib/supabase'
-import { calcularStatusBoleto } from '@/lib/utils'
+import { calcularStatusBoleto, calcularStatusIndicacao } from '@/lib/utils'
 import { X, Save, Loader2, Pencil, AlertCircle } from 'lucide-react'
 
 interface EditMultaFormProps {
@@ -34,6 +34,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
     Resposabilidade: multa.Resposabilidade || 'Empresa',
     Notas: multa.Notas || '',
     Comprovante_Pagamento: multa.Comprovante_Pagamento || '',
+    Expiracao_Indicacao: multa.Expiracao_Indicacao || '',
   })
 
   // Calcula o status automaticamente
@@ -43,6 +44,15 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
     linkBoleto: formData.Boleto,
     dataVencimento: formData.Expiracao_Boleto,
   })
+
+  // Calcula o status de indicação automaticamente
+  // Se já está indicado, mantém o status
+  const statusIndicacaoCalculado = multa.Status_Indicacao === 'Indicado'
+    ? 'Indicado'
+    : calcularStatusIndicacao({
+        indicado: false,
+        dataExpiracao: formData.Expiracao_Indicacao,
+      })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -60,6 +70,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
         .update({
           ...formData,
           Status_Boleto: statusBoletoCalculado,
+          Status_Indicacao: statusIndicacaoCalculado,
           Codigo_Infracao: formData.Codigo_Infracao ? parseInt(formData.Codigo_Infracao) : null,
         })
         .eq('id', multa.id)
@@ -270,6 +281,32 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
                   onChange={handleChange}
                   placeholder="DD/MM/AAAA"
                 />
+              </div>
+            </div>
+
+            {/* Indicação de Real Infrator */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Prazo p/ Indicação (SENATRAN)</label>
+                <Input
+                  name="Expiracao_Indicacao"
+                  value={formData.Expiracao_Indicacao}
+                  onChange={handleChange}
+                  placeholder="DD/MM/AAAA"
+                />
+                <span className="text-xs text-slate-500">Data limite para indicar o real infrator</span>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Status Indicação</label>
+                <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
+                  statusIndicacaoCalculado === 'Indicado' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' :
+                  statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
+                  statusIndicacaoCalculado === 'Faltando Indicar' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                  'bg-slate-50 text-slate-400 border-slate-200'
+                }`}>
+                  {statusIndicacaoCalculado || 'Sem indicação'}
+                </div>
+                <span className="text-xs text-slate-500">Calculado automaticamente</span>
               </div>
             </div>
 
