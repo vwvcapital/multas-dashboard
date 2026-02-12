@@ -77,12 +77,15 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
         return
       }
 
+      const isMotorista = formData.Resposabilidade === 'Motorista'
+
       const { error: supabaseError } = await supabase
         .from('Multas')
         .insert([{
           ...formData,
           Status_Boleto: statusBoletoCalculado,
-          Status_Indicacao: statusIndicacaoCalculado,
+          Status_Indicacao: isMotorista ? statusIndicacaoCalculado : null,
+          Expiracao_Indicacao: isMotorista ? formData.Expiracao_Indicacao : '',
           Codigo_Infracao: formData.Codigo_Infracao ? parseInt(formData.Codigo_Infracao) : null,
         }])
 
@@ -290,31 +293,33 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
               </div>
             </div>
 
-            {/* Indicação de Real Infrator */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Prazo p/ Indicação (SENATRAN)</label>
-                <Input
-                  name="Expiracao_Indicacao"
-                  value={formData.Expiracao_Indicacao}
-                  onChange={handleChange}
-                  placeholder="DD/MM/AAAA"
-                />
-                <span className="text-xs text-slate-500">Data limite para indicar o real infrator</span>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Status Indicação</label>
-                <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
-                  statusIndicacaoCalculado === 'Indicado' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' :
-                  statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
-                  statusIndicacaoCalculado === 'Faltando Indicar' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                  'bg-slate-50 text-slate-400 border-slate-200'
-                }`}>
-                  {statusIndicacaoCalculado || 'Sem indicação'}
+            {/* Indicação de Real Infrator - Apenas para responsabilidade do Motorista */}
+            {formData.Resposabilidade === 'Motorista' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Prazo p/ Indicação (SENATRAN)</label>
+                  <Input
+                    name="Expiracao_Indicacao"
+                    value={formData.Expiracao_Indicacao}
+                    onChange={handleChange}
+                    placeholder="DD/MM/AAAA"
+                  />
+                  <span className="text-xs text-slate-500">Data limite para indicar o real infrator</span>
                 </div>
-                <span className="text-xs text-slate-500">Calculado automaticamente</span>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Status Indicação</label>
+                  <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
+                    statusIndicacaoCalculado === 'Indicado' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' :
+                    statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
+                    statusIndicacaoCalculado === 'Faltando Indicar' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                    'bg-slate-50 text-slate-400 border-slate-200'
+                  }`}>
+                    {statusIndicacaoCalculado || 'Sem indicação'}
+                  </div>
+                  <span className="text-xs text-slate-500">Calculado automaticamente</span>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">

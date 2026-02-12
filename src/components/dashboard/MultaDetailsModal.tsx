@@ -147,8 +147,8 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
             </div>
           </div>
 
-          {/* Indicação de Real Infrator */}
-          {multa.Expiracao_Indicacao && (
+          {/* Indicação de Real Infrator - Apenas para responsabilidade do Motorista */}
+          {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Expiracao_Indicacao && (
             <div className={`border rounded-xl p-5 ${
               multa.Status_Indicacao === 'Indicado' ? 'bg-cyan-50 border-cyan-100' :
               multa.Status_Indicacao === 'Indicar Expirado' ? 'bg-red-50 border-red-100' :

@@ -83,7 +83,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
             <Badge variant={statusBoleto.variant}>
               {statusBoleto.label}
             </Badge>
-            {multa.Status_Indicacao && (() => {
+            {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao && (() => {
               const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
               return (
                 <Badge variant={statusInd.variant} className="text-[10px]">
@@ -244,7 +244,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Desfazer</span>
                 </Button>
               )}
-              {onIndicar && multa.Status_Indicacao === 'Faltando Indicar' && (
+              {onIndicar && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Faltando Indicar' && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -256,7 +256,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Indicar</span>
                 </Button>
               )}
-              {onDesfazerIndicacao && multa.Status_Indicacao === 'Indicado' && (
+              {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Indicado' && (
                 <Button
                   variant="outline"
                   size="sm"
