@@ -66,6 +66,7 @@ function App() {
     // multasIndicacaoExpirada,
     // multasIndicadas,
     // multasRecusadas,
+    multasIndicacaoProximoVencimento,
     loading, 
     error, 
     stats,
@@ -244,6 +245,8 @@ function App() {
         return multasVencidas
       case 'vencimento':
         return multasProximoVencimento
+      case 'indicacao-vencimento':
+        return multasIndicacaoProximoVencimento
       case 'todas':
         // Para RH, mostrar apenas multas a descontar e concluídas do motorista
         if (user?.role === 'rh') {
@@ -390,6 +393,10 @@ function App() {
       title: 'Próximo ao Vencimento', 
       description: 'Multas que vencem nos próximos 7 dias' 
     },
+    'indicacao-vencimento': { 
+      title: 'Próximo Expiração de Indicação', 
+      description: 'Multas com indicação pendente, ordenadas por data de expiração' 
+    },
     todas: { 
       title: 'Todas as Multas', 
       description: 'Lista completa de todas as multas registradas' 
@@ -495,6 +502,7 @@ function App() {
             concluidas: user?.role === 'rh' ? stats.concluidosMotorista : stats.concluidos,
             vencidas: stats.vencidos,
             vencimento: stats.proximoVencimento,
+            indicacaoVencimento: stats.indicacaoProximoVencimento,
             todas: user?.role === 'rh' 
               ? stats.pagosMotorista + stats.concluidosMotorista 
               : stats.total

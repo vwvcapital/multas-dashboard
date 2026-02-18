@@ -176,6 +176,18 @@ export function useMultas(options: UseMultasOptions = {}) {
     })
   }, [multas])
 
+  // Multas com indicação próxima de expirar (Faltando Indicar, ordenadas por data de expiração)
+  const multasIndicacaoProximoVencimento = useMemo(() => {
+    return multas.filter(m => {
+      return m.Status_Indicacao === 'Faltando Indicar' && m.Expiracao_Indicacao
+    }).sort((a, b) => {
+      const dataA = parseData(a.Expiracao_Indicacao || '')
+      const dataB = parseData(b.Expiracao_Indicacao || '')
+      if (!dataA || !dataB) return 0
+      return dataA.getTime() - dataB.getTime()
+    })
+  }, [multas])
+
   // Stats baseadas nos campos reais
   const valorTotal = multas.reduce((acc, m) => acc + parseValor(m.Valor), 0)
   // Valor dos boletos só considera multas "Disponível" (com desconto válido)
@@ -198,6 +210,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     indicacaoExpirada: multasIndicacaoExpirada.length,
     indicadas: multasIndicadas.length,
     recusadas: multasRecusadas.length,
+    indicacaoProximoVencimento: multasIndicacaoProximoVencimento.length,
     valorTotal,
     valorBoletoTotal,
     valorPendente: multasPendentes.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0),
@@ -481,6 +494,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     multasIndicacaoExpirada,
     multasIndicadas,
     multasRecusadas,
+    multasIndicacaoProximoVencimento,
     loading,
     error,
     stats,

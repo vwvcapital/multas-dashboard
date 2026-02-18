@@ -39,7 +39,7 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
   type Action = { label: string; icon: React.ReactNode; onClick: () => void; className: string }
   const actions: Action[] = []
 
-  if ((status === 'Faltando Indicar' || status === 'Indicar Expirado') && onIndicar) {
+  if (status === 'Faltando Indicar' && onIndicar) {
     actions.push({
       label: 'Marcar como Indicado',
       icon: <UserPlus className="h-4 w-4" />,

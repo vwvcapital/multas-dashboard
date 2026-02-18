@@ -9,13 +9,14 @@ import {
   UserCheck,
   FilePlus2,
   X,
-  History
+  History,
+  UserPlus
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { UserRole } from '@/contexts/AuthContext'
 
-export type ViewType = 'dashboard' | 'recentes' | 'pendentes' | 'disponiveis' | 'pagas-motorista' | 'concluidas' | 'vencidas' | 'vencimento' | 'todas'
+export type ViewType = 'dashboard' | 'recentes' | 'pendentes' | 'disponiveis' | 'pagas-motorista' | 'concluidas' | 'vencidas' | 'vencimento' | 'indicacao-vencimento' | 'todas'
 
 interface SidebarProps {
   className?: string
@@ -33,6 +34,7 @@ interface SidebarProps {
     concluidas: number
     vencidas: number
     vencimento: number
+    indicacaoVencimento: number
     todas: number
   }
 }
@@ -48,6 +50,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole, isOpen
     { id: 'concluidas', icon: CheckCircle2, label: 'Concluídas', count: counts?.concluidas, color: 'text-teal-600', bgColor: 'bg-teal-50' },
     { id: 'vencidas', icon: XCircle, label: 'Vencidas', count: counts?.vencidas, color: 'text-red-600', bgColor: 'bg-red-50' },
     { id: 'vencimento', icon: AlertTriangle, label: 'Próx. Vencimento', count: counts?.vencimento, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 'indicacao-vencimento', icon: UserPlus, label: 'Próx. Exp. Indicação', count: counts?.indicacaoVencimento, color: 'text-cyan-600', bgColor: 'bg-cyan-50' },
     { id: 'todas', icon: List, label: 'Todas as Multas', count: counts?.todas, color: 'text-slate-600', bgColor: 'bg-slate-100' },
   ]
 
