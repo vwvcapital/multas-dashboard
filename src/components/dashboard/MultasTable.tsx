@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -11,7 +12,116 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Multa } from '@/lib/supabase'
 import type { Permissions } from '@/contexts/AuthContext'
-import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt, UserPlus, UserX } from 'lucide-react'
+import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt, UserPlus, UserX, ChevronDown } from 'lucide-react'
+
+// Componente unificado de Indicação para a tabela
+function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerIndicacao }: {
+  multa: Multa
+  onIndicar?: (multa: Multa) => void
+  onRecusarIndicacao?: (multa: Multa) => void
+  onDesfazerIndicacao?: (multa: Multa) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
+
+  const status = multa.Status_Indicacao
+  if (multa.Resposabilidade?.toLowerCase() !== 'motorista' || !status) return null
+
+  type Action = { label: string; icon: React.ReactNode; onClick: () => void; className: string }
+  const actions: Action[] = []
+
+  if ((status === 'Faltando Indicar' || status === 'Indicar Expirado') && onIndicar) {
+    actions.push({
+      label: 'Marcar como Indicado',
+      icon: <UserPlus className="h-4 w-4" />,
+      onClick: () => { onIndicar(multa); setOpen(false) },
+      className: 'text-cyan-600 hover:bg-cyan-50'
+    })
+  }
+  if (status === 'Indicado' && onRecusarIndicacao) {
+    actions.push({
+      label: 'Motorista Recusou',
+      icon: <UserX className="h-4 w-4" />,
+      onClick: () => { onRecusarIndicacao(multa); setOpen(false) },
+      className: 'text-red-600 hover:bg-red-50'
+    })
+  }
+  if (status === 'Indicado' && onDesfazerIndicacao) {
+    actions.push({
+      label: 'Desfazer Indicação',
+      icon: <Undo2 className="h-4 w-4" />,
+      onClick: () => { onDesfazerIndicacao(multa); setOpen(false) },
+      className: 'text-orange-600 hover:bg-orange-50'
+    })
+  }
+  if (status === 'Recusado' && onDesfazerIndicacao) {
+    actions.push({
+      label: 'Desfazer Recusa',
+      icon: <Undo2 className="h-4 w-4" />,
+      onClick: () => { onDesfazerIndicacao(multa); setOpen(false) },
+      className: 'text-orange-600 hover:bg-orange-50'
+    })
+  }
+
+  if (actions.length === 0) return null
+
+  const btnColor = status === 'Indicado' ? 'text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'
+    : status === 'Recusado' ? 'text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300'
+    : 'text-cyan-600 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300'
+
+  if (actions.length === 1) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className={`h-8 px-3 gap-1.5 ${btnColor}`}
+        onClick={actions[0].onClick}
+        title={actions[0].label}
+      >
+        <UserPlus className="h-4 w-4" />
+        <span className="hidden xl:inline">Indicação</span>
+      </Button>
+    )
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <Button
+        variant="outline"
+        size="sm"
+        className={`h-8 px-3 gap-1.5 ${btnColor}`}
+        onClick={() => setOpen(!open)}
+      >
+        <UserPlus className="h-4 w-4" />
+        <span className="hidden xl:inline">Indicação</span>
+        <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </Button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+          {actions.map((action, i) => (
+            <button
+              key={i}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium ${action.className} transition-colors`}
+              onClick={action.onClick}
+            >
+              {action.icon}
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface MultasTableProps {
   multas: Multa[]
@@ -257,54 +367,12 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               <span className="hidden xl:inline">Desfazer</span>
                             </Button>
                           )}
-                          {onIndicar && multa.Resposabilidade?.toLowerCase() === 'motorista' && (multa.Status_Indicacao === 'Faltando Indicar' || multa.Status_Indicacao === 'Indicar Expirado') && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 gap-1.5 text-cyan-600 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300"
-                              onClick={() => onIndicar(multa)}
-                              title="Indicar Real Infrator"
-                            >
-                              <UserPlus className="h-4 w-4" />
-                              <span className="hidden xl:inline">Indicar</span>
-                            </Button>
-                          )}
-                          {onRecusarIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Indicado' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                              onClick={() => onRecusarIndicacao(multa)}
-                              title="Motorista Recusou Indicação"
-                            >
-                              <UserX className="h-4 w-4" />
-                              <span className="hidden xl:inline">Recusar</span>
-                            </Button>
-                          )}
-                          {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Indicado' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
-                              onClick={() => onDesfazerIndicacao(multa)}
-                              title="Desfazer Indicação"
-                            >
-                              <Undo2 className="h-4 w-4" />
-                              <span className="hidden xl:inline">Desfazer</span>
-                            </Button>
-                          )}
-                          {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Recusado' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
-                              onClick={() => onDesfazerIndicacao(multa)}
-                              title="Desfazer Recusa (voltar para Indicado)"
-                            >
-                              <Undo2 className="h-4 w-4" />
-                              <span className="hidden xl:inline">Desfazer</span>
-                            </Button>
-                          )}
+                          <IndicacaoDropdown
+                            multa={multa}
+                            onIndicar={onIndicar}
+                            onRecusarIndicacao={onRecusarIndicacao}
+                            onDesfazerIndicacao={onDesfazerIndicacao}
+                          />
                           {onViewDetails && (
                             <Button
                               variant="default"
