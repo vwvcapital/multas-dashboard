@@ -257,7 +257,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               <span className="hidden xl:inline">Desfazer</span>
                             </Button>
                           )}
-                          {onIndicar && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Faltando Indicar' && (
+                          {onIndicar && multa.Resposabilidade?.toLowerCase() === 'motorista' && (multa.Status_Indicacao === 'Faltando Indicar' || multa.Status_Indicacao === 'Indicar Expirado') && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -267,6 +267,18 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                             >
                               <UserPlus className="h-4 w-4" />
                               <span className="hidden xl:inline">Indicar</span>
+                            </Button>
+                          )}
+                          {onRecusarIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Indicado' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                              onClick={() => onRecusarIndicacao(multa)}
+                              title="Motorista Recusou Indicação"
+                            >
+                              <UserX className="h-4 w-4" />
+                              <span className="hidden xl:inline">Recusar</span>
                             </Button>
                           )}
                           {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Indicado' && (
@@ -281,25 +293,13 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               <span className="hidden xl:inline">Desfazer</span>
                             </Button>
                           )}
-                          {onRecusarIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Faltando Indicar' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                              onClick={() => onRecusarIndicacao(multa)}
-                              title="Motorista Recusou Indicação"
-                            >
-                              <UserX className="h-4 w-4" />
-                              <span className="hidden xl:inline">Recusar</span>
-                            </Button>
-                          )}
                           {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Recusado' && (
                             <Button
                               variant="outline"
                               size="sm"
                               className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
                               onClick={() => onDesfazerIndicacao(multa)}
-                              title="Desfazer Recusa"
+                              title="Desfazer Recusa (voltar para Indicado)"
                             >
                               <Undo2 className="h-4 w-4" />
                               <span className="hidden xl:inline">Desfazer</span>

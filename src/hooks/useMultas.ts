@@ -411,16 +411,22 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas])
 
-  // Função para desfazer indicação (voltar para Faltando Indicar ou Indicar Expirado)
+  // Função para desfazer indicação
+  // Se Recusado → volta para Indicado
+  // Se Indicado → recalcula (Faltando Indicar ou Indicar Expirado)
   const desfazerIndicacao = useCallback(async (multaId: number) => {
     try {
       const multa = multas.find(m => m.id === multaId)
       if (!multa) return false
 
-      const novoStatus = calcularStatusIndicacao({
-        indicado: false,
-        dataExpiracao: multa.Expiracao_Indicacao || '',
-      })
+      // Se está Recusado, volta para Indicado
+      // Se está Indicado, recalcula baseado na data de expiração
+      const novoStatus = multa.Status_Indicacao === 'Recusado' 
+        ? 'Indicado'
+        : calcularStatusIndicacao({
+            indicado: false,
+            dataExpiracao: multa.Expiracao_Indicacao || '',
+          })
 
       const { error: supabaseError } = await supabase
         .from('Multas')
