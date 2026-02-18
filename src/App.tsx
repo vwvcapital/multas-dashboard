@@ -13,6 +13,7 @@ import { StatusChartPeriod } from '@/components/dashboard/StatusChartPeriod'
 import { VehicleChart } from '@/components/dashboard/VehicleChart'
 import { ResponsibilityChart } from '@/components/dashboard/ResponsibilityChart'
 import { DescriptionChart } from '@/components/dashboard/DescriptionChart'
+import { IndicacaoChart } from '@/components/dashboard/IndicacaoChart'
 import { NovaMultaForm } from '@/components/dashboard/NovaMultaForm'
 import { EditMultaForm } from '@/components/dashboard/EditMultaForm'
 import { DeleteMultaDialog } from '@/components/dashboard/DeleteMultaDialog'
@@ -64,6 +65,7 @@ function App() {
     // multasFaltandoIndicar,
     // multasIndicacaoExpirada,
     // multasIndicadas,
+    // multasRecusadas,
     loading, 
     error, 
     stats,
@@ -72,6 +74,7 @@ function App() {
     desfazerConclusao,
     desmarcarPagamento,
     indicarMotorista,
+    recusarIndicacao,
     desfazerIndicacao,
     refetch 
   } = useMultas({ userRole: user?.role })
@@ -166,6 +169,18 @@ function App() {
     if (success) {
       await registrarLog({
         action: 'desfazer_indicacao',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { motorista: multa.Motorista },
+      })
+    }
+  }
+
+  const handleRecusarIndicacao = async (multa: Multa) => {
+    const success = await recusarIndicacao(multa.id)
+    if (success) {
+      await registrarLog({
+        action: 'recusar_indicacao',
         entityId: multa.id,
         entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
         details: { motorista: multa.Motorista },
@@ -287,7 +302,8 @@ function App() {
       (indicacaoFilter === 'indicado' && multa.Status_Indicacao === 'Indicado') ||
       (indicacaoFilter === 'nao-indicado' && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao !== 'Indicado') ||
       (indicacaoFilter === 'faltando' && multa.Status_Indicacao === 'Faltando Indicar') ||
-      (indicacaoFilter === 'expirado' && multa.Status_Indicacao === 'Indicar Expirado')
+      (indicacaoFilter === 'expirado' && multa.Status_Indicacao === 'Indicar Expirado') ||
+      (indicacaoFilter === 'recusado' && multa.Status_Indicacao === 'Recusado')
     
     return matchesSearch && matchesStatus && matchesIndicacao
   })
@@ -319,6 +335,7 @@ function App() {
     { value: 'nao-indicado', label: 'Não Indicado' },
     { value: 'faltando', label: 'Faltando Indicar' },
     { value: 'expirado', label: 'Indicação Expirada' },
+    { value: 'recusado', label: 'Recusado' },
   ]
 
   const sortOptions = [
@@ -598,6 +615,13 @@ function App() {
                 {!loading && multas.length > 0 && (
                   <MultasPeriodChart multas={multas} />
                 )}
+
+                {/* Chart de Indicação - apenas para admin */}
+                {!loading && multas.length > 0 && permissions.canViewIndicacao && (
+                  <div className="grid gap-4 lg:grid-cols-1">
+                    <IndicacaoChart multas={multas} />
+                  </div>
+                )}
               </>
             )}
 
@@ -792,6 +816,7 @@ function App() {
                       onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
                       onIndicar={permissions.canViewIndicacao ? handleIndicarMotorista : undefined}
                       onDesfazerIndicacao={permissions.canViewIndicacao ? handleDesfazerIndicacao : undefined}
+                      onRecusarIndicacao={permissions.canViewIndicacao ? handleRecusarIndicacao : undefined}
                       permissions={permissions}
                     />
                   </div>
@@ -813,6 +838,7 @@ function App() {
                     onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
                     onIndicar={permissions.canViewIndicacao ? handleIndicarMotorista : undefined}
                     onDesfazerIndicacao={permissions.canViewIndicacao ? handleDesfazerIndicacao : undefined}
+                    onRecusarIndicacao={permissions.canViewIndicacao ? handleRecusarIndicacao : undefined}
                     permissions={permissions}
                   />
                 </div>

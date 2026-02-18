@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Multa } from '@/lib/supabase'
 import type { Permissions } from '@/contexts/AuthContext'
-import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt, UserPlus } from 'lucide-react'
+import { FileText, ExternalLink, Eye, Pencil, Trash2, CheckCircle, CheckCircle2, Undo2, ClipboardList, Receipt, UserPlus, UserX } from 'lucide-react'
 
 interface MultasTableProps {
   multas: Multa[]
@@ -25,6 +25,7 @@ interface MultasTableProps {
   onUndoComplete?: (multa: Multa) => void
   onIndicar?: (multa: Multa) => void
   onDesfazerIndicacao?: (multa: Multa) => void
+  onRecusarIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
@@ -41,9 +42,10 @@ const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' 
   'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
   'Indicado': { label: 'Indicado', variant: 'blue' },
   'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
+  'Recusado': { label: 'Recusado', variant: 'destructive' },
 }
 
-export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultasTableProps) {
+export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, permissions }: MultasTableProps) {
   const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
   const canAccessConsulta = permissions?.canAccessConsulta ?? true
@@ -274,6 +276,30 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
                               onClick={() => onDesfazerIndicacao(multa)}
                               title="Desfazer Indicação"
+                            >
+                              <Undo2 className="h-4 w-4" />
+                              <span className="hidden xl:inline">Desfazer</span>
+                            </Button>
+                          )}
+                          {onRecusarIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Faltando Indicar' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                              onClick={() => onRecusarIndicacao(multa)}
+                              title="Motorista Recusou Indicação"
+                            >
+                              <UserX className="h-4 w-4" />
+                              <span className="hidden xl:inline">Recusar</span>
+                            </Button>
+                          )}
+                          {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Recusado' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
+                              onClick={() => onDesfazerIndicacao(multa)}
+                              title="Desfazer Recusa"
                             >
                               <Undo2 className="h-4 w-4" />
                               <span className="hidden xl:inline">Desfazer</span>

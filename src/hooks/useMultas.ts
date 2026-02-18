@@ -34,8 +34,8 @@ function recalcularStatusBoleto(multa: Multa): Multa {
 
 // Função para recalcular o status de indicação de cada multa
 function recalcularStatusIndicacao(multa: Multa): Multa {
-  // Se já está indicado, não recalcular
-  if (multa.Status_Indicacao === 'Indicado') {
+  // Se já está indicado ou recusado, não recalcular
+  if (multa.Status_Indicacao === 'Indicado' || multa.Status_Indicacao === 'Recusado') {
     return multa
   }
 
@@ -150,6 +150,12 @@ export function useMultas(options: UseMultasOptions = {}) {
     [multas]
   )
 
+  // Multas com indicação recusada pelo motorista
+  const multasRecusadas = useMemo(() => 
+    multas.filter(m => m.Status_Indicacao === 'Recusado'), 
+    [multas]
+  )
+
   // Multas próximas do vencimento (7 dias) - inclui Pendente e Disponível
   // Ordenadas por data de vencimento (mais próxima primeiro)
   const multasProximoVencimento = useMemo(() => {
@@ -191,6 +197,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     faltandoIndicar: multasFaltandoIndicar.length,
     indicacaoExpirada: multasIndicacaoExpirada.length,
     indicadas: multasIndicadas.length,
+    recusadas: multasRecusadas.length,
     valorTotal,
     valorBoletoTotal,
     valorPendente: multasPendentes.reduce((acc, m) => acc + parseValor(m.Valor_Boleto), 0),
@@ -383,6 +390,27 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas])
 
+  // Função para marcar indicação como recusada pelo motorista
+  const recusarIndicacao = useCallback(async (multaId: number) => {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('Multas')
+        .update({ Status_Indicacao: 'Recusado' })
+        .eq('id', multaId)
+
+      if (supabaseError) {
+        console.error('Erro ao recusar indicação:', supabaseError)
+        return false
+      }
+
+      await fetchMultas()
+      return true
+    } catch (err) {
+      console.error('Erro ao recusar indicação:', err)
+      return false
+    }
+  }, [fetchMultas])
+
   // Função para desfazer indicação (voltar para Faltando Indicar ou Indicar Expirado)
   const desfazerIndicacao = useCallback(async (multaId: number) => {
     try {
@@ -446,6 +474,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     multasFaltandoIndicar,
     multasIndicacaoExpirada,
     multasIndicadas,
+    multasRecusadas,
     loading,
     error,
     stats,
@@ -457,6 +486,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     desfazerConclusao,
     desmarcarPagamento,
     indicarMotorista,
+    recusarIndicacao,
     desfazerIndicacao,
     refetch: fetchMultas
   }

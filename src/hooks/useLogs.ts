@@ -21,6 +21,7 @@ type ActionType =
   | 'desfazer_conclusao'
   | 'indicar_motorista'
   | 'desfazer_indicacao'
+  | 'recusar_indicacao'
   | 'criar_multa'
   | 'editar_multa'
   | 'excluir_multa'

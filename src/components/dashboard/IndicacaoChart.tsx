@@ -1,0 +1,249 @@
+import { useState, useMemo } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { PieChart as PieChartIcon, BarChart3, UserPlus } from 'lucide-react'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from 'recharts'
+import type { Multa } from '@/lib/supabase'
+
+type PeriodType = 'all' | 'week' | 'month' | 'quarter' | 'semester' | 'year'
+type ChartType = 'pie' | 'bar'
+
+interface IndicacaoChartProps {
+  multas: Multa[]
+}
+
+const COLORS: Record<string, string> = {
+  'Faltando Indicar': '#f59e0b',
+  'Indicado': '#3b82f6',
+  'Indicar Expirado': '#ef4444',
+  'Recusado': '#dc2626',
+}
+
+const periodOptions = [
+  { value: 'all', label: 'Todos' },
+  { value: 'week', label: 'Última Semana' },
+  { value: 'month', label: 'Último Mês' },
+  { value: 'quarter', label: 'Último Trimestre' },
+  { value: 'semester', label: 'Último Semestre' },
+  { value: 'year', label: 'Último Ano' },
+]
+
+function parseData(data: string): Date | null {
+  if (!data) return null
+  const parts = data.split('/')
+  if (parts.length !== 3) return null
+  const [dia, mes, ano] = parts
+  return new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia))
+}
+
+function getStartDate(period: PeriodType): Date | null {
+  if (period === 'all') return null
+  const now = new Date()
+  switch (period) {
+    case 'week':
+      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    case 'month':
+      return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+    case 'quarter':
+      return new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
+    case 'semester':
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+    case 'year':
+      return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
+    default:
+      return null
+  }
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  'Faltando Indicar': 'Faltando Indicar',
+  'Indicado': 'Indicado',
+  'Indicar Expirado': 'Indicação Expirada',
+  'Recusado': 'Recusado',
+}
+
+export function IndicacaoChart({ multas }: IndicacaoChartProps) {
+  const [period, setPeriod] = useState<PeriodType>('all')
+  const [chartType, setChartType] = useState<ChartType>('pie')
+
+  const filteredData = useMemo(() => {
+    const startDate = getStartDate(period)
+    
+    // Filtrar apenas multas de responsabilidade do motorista (únicas que podem ser indicadas)
+    const motoristaMultas = multas.filter(m => 
+      m.Resposabilidade?.toLowerCase() === 'motorista'
+    )
+    
+    const filtered = startDate 
+      ? motoristaMultas.filter(multa => {
+          const multaDate = parseData(multa.Data_Cometimento)
+          if (!multaDate) return false
+          return multaDate >= startDate
+        })
+      : motoristaMultas
+
+    const counts: Record<string, number> = {
+      'Faltando Indicar': 0,
+      'Indicado': 0,
+      'Indicar Expirado': 0,
+      'Recusado': 0,
+    }
+
+    filtered.forEach(m => {
+      const status = m.Status_Indicacao
+      if (status && status in counts) {
+        counts[status]++
+      }
+    })
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0)
+
+    const chartData = Object.entries(counts)
+      .filter(([, value]) => value > 0)
+      .map(([status, value]) => ({
+        name: STATUS_LABELS[status] || status,
+        value,
+        color: COLORS[status] || '#94a3b8',
+        percent: total > 0 ? value / total : 0,
+      }))
+
+    return { chartData, total }
+  }, [multas, period])
+
+  const { chartData, total } = filteredData
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2.5 text-base sm:text-lg">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
+              <UserPlus className="h-4 w-4 text-blue-600" />
+            </div>
+            Indicação de Infrator
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Select
+              options={periodOptions}
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as PeriodType)}
+              className="text-xs h-8 w-[140px]"
+            />
+            <div className="flex rounded-lg border border-slate-200 overflow-hidden">
+              <Button
+                variant={chartType === 'pie' ? 'default' : 'ghost'}
+                size="sm"
+                className="h-8 px-2 rounded-none"
+                onClick={() => setChartType('pie')}
+              >
+                <PieChartIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={chartType === 'bar' ? 'default' : 'ghost'}
+                size="sm"
+                className="h-8 px-2 rounded-none border-l"
+                onClick={() => setChartType('bar')}
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-2">
+        {total === 0 ? (
+          <div className="h-[350px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center">
+                <UserPlus className="h-6 w-6 text-slate-400" />
+              </div>
+              <p className="text-muted-foreground font-medium">Sem dados para o período</p>
+            </div>
+          </div>
+        ) : chartType === 'pie' ? (
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={120}
+                paddingAngle={3}
+                dataKey="value"
+                isAnimationActive={false}
+                label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                labelLine={{ stroke: '#64748b' }}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  border: 'none',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
+                  padding: '12px 16px'
+                }}
+                formatter={(value, name) => [`${value ?? 0} multa(s)`, String(name)]}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                formatter={(value: string) => <span style={{ color: '#0f172a' }}>{value}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: '#64748b', fontSize: 12 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e2e8f0' }}
+              />
+              <YAxis 
+                tick={{ fill: '#64748b', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                width={35}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  border: 'none',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
+                  padding: '12px 16px'
+                }}
+                formatter={(value) => [`${value ?? 0} multa(s)`, '']}
+              />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={80}>
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

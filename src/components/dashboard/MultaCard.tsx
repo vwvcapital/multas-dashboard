@@ -18,7 +18,8 @@ import {
   CheckCircle2,
   Undo2,
   Receipt,
-  UserPlus
+  UserPlus,
+  UserX
 } from 'lucide-react'
 
 interface MultaCardProps {
@@ -32,6 +33,7 @@ interface MultaCardProps {
   onUndoComplete?: (multa: Multa) => void
   onIndicar?: (multa: Multa) => void
   onDesfazerIndicacao?: (multa: Multa) => void
+  onRecusarIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
@@ -48,11 +50,12 @@ const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' 
   'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
   'Indicado': { label: 'Indicado', variant: 'blue' },
   'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
+  'Recusado': { label: 'Recusado', variant: 'destructive' },
 }
 
-export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultaCardProps) {
+export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, permissions }: MultaCardProps) {
   const statusBoleto = statusBoletoConfig[multa.Status_Boleto] || { label: multa.Status_Boleto || '-', variant: 'secondary' as const }
-  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao
+  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao || onRecusarIndicacao
   
   // Permissões com fallback para true (comportamento padrão)
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
@@ -279,6 +282,30 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Desfazer</span>
                 </Button>
               )}
+              {onRecusarIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Faltando Indicar' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  onClick={() => onRecusarIndicacao(multa)}
+                  title="Motorista Recusou Indicação"
+                >
+                  <UserX className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Recusar</span>
+                </Button>
+              )}
+              {onDesfazerIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao === 'Recusado' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 text-xs text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
+                  onClick={() => onDesfazerIndicacao(multa)}
+                  title="Desfazer Recusa"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Desfazer</span>
+                </Button>
+              )}
               {onViewDetails && (
                 <Button
                   variant="default"
@@ -332,10 +359,11 @@ interface MultasCardsProps {
   onUndoComplete?: (multa: Multa) => void
   onIndicar?: (multa: Multa) => void
   onDesfazerIndicacao?: (multa: Multa) => void
+  onRecusarIndicacao?: (multa: Multa) => void
   permissions?: Permissions
 }
 
-export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, permissions }: MultasCardsProps) {
+export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, permissions }: MultasCardsProps) {
   if (multas.length === 0) {
     return (
       <div className="text-center py-16">
@@ -363,6 +391,7 @@ export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsP
           onUndoComplete={onUndoComplete}
           onIndicar={onIndicar}
           onDesfazerIndicacao={onDesfazerIndicacao}
+          onRecusarIndicacao={onRecusarIndicacao}
           permissions={permissions}
         />
       ))}
