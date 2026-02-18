@@ -32,9 +32,9 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
-const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' | 'blue' }> = {
   'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
-  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicado': { label: 'Indicado', variant: 'blue' },
   'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
 }
 
@@ -150,18 +150,18 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
           {/* Indicação de Real Infrator - Apenas para responsabilidade do Motorista */}
           {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Expiracao_Indicacao && (
             <div className={`border rounded-xl p-5 ${
-              multa.Status_Indicacao === 'Indicado' ? 'bg-cyan-50 border-cyan-100' :
+              multa.Status_Indicacao === 'Indicado' ? 'bg-blue-50 border-blue-100' :
               multa.Status_Indicacao === 'Indicar Expirado' ? 'bg-red-50 border-red-100' :
               'bg-amber-50 border-amber-100'
             }`}>
               <div className="flex items-center gap-2 mb-3">
                 <UserPlus className={`h-5 w-5 ${
-                  multa.Status_Indicacao === 'Indicado' ? 'text-cyan-500' :
+                  multa.Status_Indicacao === 'Indicado' ? 'text-blue-500' :
                   multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-500' :
                   'text-amber-500'
                 }`} />
                 <span className={`font-semibold ${
-                  multa.Status_Indicacao === 'Indicado' ? 'text-cyan-700' :
+                  multa.Status_Indicacao === 'Indicado' ? 'text-blue-700' :
                   multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-700' :
                   'text-amber-700'
                 }`}>Indicação de Real Infrator (SENATRAN)</span>
@@ -175,7 +175,7 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
                 })()}
               </div>
               <p className={`text-sm ${
-                multa.Status_Indicacao === 'Indicado' ? 'text-cyan-800' :
+                multa.Status_Indicacao === 'Indicado' ? 'text-blue-800' :
                 multa.Status_Indicacao === 'Indicar Expirado' ? 'text-red-800' :
                 'text-amber-800'
               }`}>

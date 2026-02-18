@@ -37,9 +37,9 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
-const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' | 'blue' }> = {
   'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
-  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicado': { label: 'Indicado', variant: 'blue' },
   'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
 }
 
@@ -48,6 +48,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
   const canAccessConsulta = permissions?.canAccessConsulta ?? true
   const canMarkAsComplete = permissions?.canMarkAsComplete ?? true
+  const canViewIndicacao = permissions?.canViewIndicacao ?? true
   
   return (
     <Card className="overflow-hidden">
@@ -73,7 +74,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                 <TableHead className="text-right font-semibold text-slate-700">Valor</TableHead>
                 <TableHead className="text-right font-semibold text-slate-700">Valor Boleto</TableHead>
                 <TableHead className="text-center font-semibold text-slate-700">Status</TableHead>
-                <TableHead className="text-center font-semibold text-slate-700">Indicação</TableHead>
+                {canViewIndicacao && <TableHead className="text-center font-semibold text-slate-700">Indicação</TableHead>}
                 <TableHead className="text-center font-semibold text-slate-700">Links</TableHead>
                 {showActions && <TableHead className="text-center font-semibold text-slate-700">Ações</TableHead>}
               </TableRow>
@@ -81,7 +82,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
             <TableBody>
             {multas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={showActions ? 12 : 11} className="text-center py-12">
+                <TableCell colSpan={(showActions ? 12 : 11) - (canViewIndicacao ? 0 : 1)} className="text-center py-12">
                   <div className="flex flex-col items-center">
                     <div className="w-12 h-12 mb-3 rounded-xl bg-slate-100 flex items-center justify-center">
                       <FileText className="h-6 w-6 text-slate-400" />
@@ -131,18 +132,20 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                         {statusBoleto.label}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center">
-                      {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao ? (() => {
-                        const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
-                        return (
-                          <Badge variant={statusInd.variant} className="text-[10px]">
-                            {statusInd.label}
-                          </Badge>
-                        )
-                      })() : (
-                        <span className="text-xs text-slate-400">-</span>
-                      )}
-                    </TableCell>
+                    {canViewIndicacao && (
+                      <TableCell className="text-center">
+                        {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao ? (() => {
+                          const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
+                          return (
+                            <Badge variant={statusInd.variant} className="text-[10px]">
+                              {statusInd.label}
+                            </Badge>
+                          )
+                        })() : (
+                          <span className="text-xs text-slate-400">-</span>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="flex items-center gap-2 justify-center">
                         {canAccessBoleto && multa.Boleto && multa.Status_Boleto !== 'Vencido' ? (

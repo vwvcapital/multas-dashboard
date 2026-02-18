@@ -44,9 +44,9 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
-const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' }> = {
+const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' | 'cyan' | 'blue' }> = {
   'Faltando Indicar': { label: 'Faltando Indicar', variant: 'warning' },
-  'Indicado': { label: 'Indicado', variant: 'cyan' },
+  'Indicado': { label: 'Indicado', variant: 'blue' },
   'Indicar Expirado': { label: 'Indicação Expirada', variant: 'destructive' },
 }
 
@@ -61,6 +61,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
   const canMarkAsComplete = permissions?.canMarkAsComplete ?? true
   const canEdit = permissions?.canEdit ?? true
   const canDelete = permissions?.canDelete ?? true
+  const canViewIndicacao = permissions?.canViewIndicacao ?? true
 
   return (
     <Card className="hover-lift group">
@@ -83,7 +84,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
             <Badge variant={statusBoleto.variant}>
               {statusBoleto.label}
             </Badge>
-            {multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao && (() => {
+            {canViewIndicacao && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao && (() => {
               const statusInd = statusIndicacaoConfig[multa.Status_Indicacao] || { label: multa.Status_Indicacao, variant: 'secondary' as const }
               return (
                 <Badge variant={statusInd.variant} className="text-[10px]">
@@ -92,6 +93,16 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
               )
             })()}
           </div>
+        </div>
+
+        {/* Responsabilidade */}
+        <div className="flex items-center gap-2 mb-3">
+          <Badge 
+            variant={multa.Resposabilidade?.toLowerCase() === 'motorista' ? 'purple' : 'default'} 
+            className="text-[10px]"
+          >
+            {multa.Resposabilidade || 'Não definida'}
+          </Badge>
         </div>
 
         {/* Descrição */}

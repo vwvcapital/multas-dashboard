@@ -20,6 +20,7 @@ export interface Permissions {
   canEdit: boolean
   canDelete: boolean
   canCreate: boolean
+  canViewIndicacao: boolean
 }
 
 // Definição de permissões por role
@@ -33,6 +34,7 @@ const rolePermissions: Record<UserRole, Permissions> = {
     canEdit: true,
     canDelete: true,
     canCreate: true,
+    canViewIndicacao: true,
   },
   financeiro: {
     canViewDetails: true,
@@ -43,6 +45,7 @@ const rolePermissions: Record<UserRole, Permissions> = {
     canEdit: false,
     canDelete: false,
     canCreate: false,
+    canViewIndicacao: false,
   },
   rh: {
     canViewDetails: true,
@@ -53,6 +56,7 @@ const rolePermissions: Record<UserRole, Permissions> = {
     canEdit: false,
     canDelete: false,
     canCreate: false,
+    canViewIndicacao: false,
   },
 }
 

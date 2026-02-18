@@ -145,6 +145,30 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Responsabilidade *</label>
+                <Select
+                  name="Resposabilidade"
+                  value={formData.Resposabilidade}
+                  onChange={handleChange}
+                  options={responsabilidadeOptions}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">
+                  Motorista {formData.Resposabilidade === 'Motorista' ? '*' : '(opcional)'}
+                </label>
+                <Input
+                  name="Motorista"
+                  value={formData.Motorista}
+                  onChange={handleChange}
+                  placeholder="Nome do motorista"
+                  required={formData.Resposabilidade === 'Motorista'}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Auto de Infração *</label>
                 <Input
                   name="Auto_Infracao"
@@ -174,16 +198,6 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
                   value={formData.Veiculo}
                   onChange={handleChange}
                   placeholder="Ex: TJM8B99"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Motorista *</label>
-                <Input
-                  name="Motorista"
-                  value={formData.Motorista}
-                  onChange={handleChange}
-                  placeholder="Nome do motorista"
                   required
                 />
               </div>
@@ -254,7 +268,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Status Boleto</label>
                 <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
@@ -266,15 +280,6 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
                   {statusBoletoCalculado}
                 </div>
                 <span className="text-xs text-slate-500">Calculado automaticamente</span>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Responsabilidade</label>
-                <Select
-                  name="Resposabilidade"
-                  value={formData.Resposabilidade}
-                  onChange={handleChange}
-                  options={responsabilidadeOptions}
-                />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Vencimento Boleto</label>
@@ -303,7 +308,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700">Status Indicação</label>
                   <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
-                    statusIndicacaoCalculado === 'Indicado' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' :
+                    statusIndicacaoCalculado === 'Indicado' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                     statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
                     statusIndicacaoCalculado === 'Faltando Indicar' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                     'bg-slate-50 text-slate-400 border-slate-200'

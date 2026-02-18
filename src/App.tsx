@@ -92,6 +92,7 @@ function App() {
   const [payingMulta, setPayingMulta] = useState<Multa | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
+  const [indicacaoFilter, setIndicacaoFilter] = useState('todos')
   const [sortOption, setSortOption] = useState<SortOption>('recente')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showLogsModal, setShowLogsModal] = useState(false)
@@ -281,8 +282,14 @@ function App() {
       (multa.Codigo_Infracao ? String(multa.Codigo_Infracao) : '').toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesStatus = statusFilter === 'todos' || multa.Status_Boleto === statusFilter
+
+    const matchesIndicacao = indicacaoFilter === 'todos' ||
+      (indicacaoFilter === 'indicado' && multa.Status_Indicacao === 'Indicado') ||
+      (indicacaoFilter === 'nao-indicado' && multa.Resposabilidade?.toLowerCase() === 'motorista' && multa.Status_Indicacao !== 'Indicado') ||
+      (indicacaoFilter === 'faltando' && multa.Status_Indicacao === 'Faltando Indicar') ||
+      (indicacaoFilter === 'expirado' && multa.Status_Indicacao === 'Indicar Expirado')
     
-    return matchesSearch && matchesStatus
+    return matchesSearch && matchesStatus && matchesIndicacao
   })
 
   // Aplicar ordenação às multas filtradas
@@ -304,6 +311,14 @@ function App() {
     { value: 'Descontar', label: 'À Descontar' },
     { value: 'Concluído', label: 'Concluídos' },
     { value: 'Vencido', label: 'Vencidos' },
+  ]
+
+  const indicacaoOptions = [
+    { value: 'todos', label: 'Todas Indicações' },
+    { value: 'indicado', label: 'Indicado' },
+    { value: 'nao-indicado', label: 'Não Indicado' },
+    { value: 'faltando', label: 'Faltando Indicar' },
+    { value: 'expirado', label: 'Indicação Expirada' },
   ]
 
   const sortOptions = [
@@ -691,12 +706,22 @@ function App() {
                 
                 <div className="flex items-center gap-2">
                   {currentView === 'todas' && (
-                    <Select
-                      options={statusOptions}
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full sm:w-48"
-                    />
+                    <>
+                      <Select
+                        options={statusOptions}
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full sm:w-48"
+                      />
+                      {permissions.canViewIndicacao && (
+                        <Select
+                          options={indicacaoOptions}
+                          value={indicacaoFilter}
+                          onChange={(e) => setIndicacaoFilter(e.target.value)}
+                          className="w-full sm:w-48"
+                        />
+                      )}
+                    </>
                   )}
                   
                   {/* Sort Select */}
@@ -765,8 +790,8 @@ function App() {
                       onUnmarkAsPaid={permissions.canMarkAsPaid ? handleDesmarcarPagamento : undefined}
                       onMarkAsComplete={permissions.canMarkAsComplete ? handleMarcarComoConcluido : undefined}
                       onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
-                      onIndicar={permissions.canEdit ? handleIndicarMotorista : undefined}
-                      onDesfazerIndicacao={permissions.canEdit ? handleDesfazerIndicacao : undefined}
+                      onIndicar={permissions.canViewIndicacao ? handleIndicarMotorista : undefined}
+                      onDesfazerIndicacao={permissions.canViewIndicacao ? handleDesfazerIndicacao : undefined}
                       permissions={permissions}
                     />
                   </div>
@@ -786,8 +811,8 @@ function App() {
                     onUnmarkAsPaid={permissions.canMarkAsPaid ? handleDesmarcarPagamento : undefined}
                     onMarkAsComplete={permissions.canMarkAsComplete ? handleMarcarComoConcluido : undefined}
                     onUndoComplete={permissions.canMarkAsComplete ? handleDesfazerConclusao : undefined}
-                    onIndicar={permissions.canEdit ? handleIndicarMotorista : undefined}
-                    onDesfazerIndicacao={permissions.canEdit ? handleDesfazerIndicacao : undefined}
+                    onIndicar={permissions.canViewIndicacao ? handleIndicarMotorista : undefined}
+                    onDesfazerIndicacao={permissions.canViewIndicacao ? handleDesfazerIndicacao : undefined}
                     permissions={permissions}
                   />
                 </div>
