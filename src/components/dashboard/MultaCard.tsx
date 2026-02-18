@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -107,10 +108,24 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
     )
   }
 
-  // Múltiplas ações → dropdown
+  // Múltiplas ações → dropdown via portal
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
+
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setMenuPos({
+        top: rect.bottom + 4,
+        left: Math.max(8, rect.right - 192), // 192 = w-48
+      })
+    }
+  }, [open])
+
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref}>
       <Button
+        ref={btnRef}
         variant="outline"
         size="sm"
         className={`h-8 px-3 gap-1.5 text-xs ${btnColor}`}
@@ -120,8 +135,11 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
         <span className={labelClass}>Indicação</span>
         <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
       </Button>
-      {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+      {open && createPortal(
+        <div
+          className="fixed w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-[9999] animate-in fade-in-0 zoom-in-95"
+          style={{ top: menuPos.top, left: menuPos.left }}
+        >
           {actions.map((action, i) => (
             <button
               key={i}
@@ -132,7 +150,8 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
               {action.label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
