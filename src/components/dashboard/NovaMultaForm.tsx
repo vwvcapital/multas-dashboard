@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { calcularStatusBoleto, calcularStatusIndicacao } from '@/lib/utils'
-import { X, Plus, Loader2, AlertCircle } from 'lucide-react'
+import { extrairDadosMultaPDF } from '@/lib/pdfParser'
+import { X, Plus, Loader2, AlertCircle, Upload, FileText } from 'lucide-react'
 
 interface NovaMultaFormProps {
   onClose: () => void
@@ -14,7 +15,10 @@ interface NovaMultaFormProps {
 
 export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
   const [loading, setLoading] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfFileName, setPdfFileName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
     Auto_Infracao: '',
@@ -52,6 +56,49 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.type !== 'application/pdf') {
+      setError('Por favor, selecione um arquivo PDF.')
+      return
+    }
+
+    setPdfLoading(true)
+    setError(null)
+    setPdfFileName(file.name)
+
+    try {
+      const dados = await extrairDadosMultaPDF(file)
+      console.log('[PDF Upload] Dados extraídos:', dados)
+
+      // Preencher apenas campos que foram encontrados (não sobrescrever dados já preenchidos)
+      setFormData(prev => ({
+        ...prev,
+        ...(dados.Auto_Infracao && !prev.Auto_Infracao ? { Auto_Infracao: dados.Auto_Infracao } : {}),
+        ...(dados.Veiculo && !prev.Veiculo ? { Veiculo: dados.Veiculo } : {}),
+        ...(dados.Data_Cometimento && !prev.Data_Cometimento ? { Data_Cometimento: dados.Data_Cometimento } : {}),
+        ...(dados.Hora_Cometimento && !prev.Hora_Cometimento ? { Hora_Cometimento: dados.Hora_Cometimento } : {}),
+        ...(dados.Descricao && !prev.Descricao ? { Descricao: dados.Descricao } : {}),
+        ...(dados.Codigo_Infracao && !prev.Codigo_Infracao ? { Codigo_Infracao: dados.Codigo_Infracao } : {}),
+        ...(dados.Valor && !prev.Valor ? { Valor: dados.Valor } : {}),
+        ...(dados.Estado && !prev.Estado ? { Estado: dados.Estado } : {}),
+        ...(dados.Motorista && !prev.Motorista ? { Motorista: dados.Motorista } : {}),
+      }))
+    } catch (err) {
+      console.error('[PDF Upload] Erro ao processar PDF:', err)
+      setError('Erro ao processar o PDF. Verifique se o arquivo é válido.')
+      setPdfFileName(null)
+    } finally {
+      setPdfLoading(false)
+      // Reset file input para permitir reenvio do mesmo arquivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +189,51 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Upload de PDF */}
+            <div className="relative">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf"
+                onChange={handlePdfUpload}
+                className="hidden"
+                id="pdf-upload"
+              />
+              <label
+                htmlFor="pdf-upload"
+                className={`flex items-center justify-center gap-3 w-full p-4 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${
+                  pdfLoading
+                    ? 'border-blue-300 bg-blue-50'
+                    : pdfFileName
+                    ? 'border-emerald-300 bg-emerald-50 hover:border-emerald-400'
+                    : 'border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50'
+                }`}
+              >
+                {pdfLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                    <span className="text-sm font-medium text-blue-600">Processando PDF...</span>
+                  </>
+                ) : pdfFileName ? (
+                  <>
+                    <FileText className="h-5 w-5 text-emerald-500" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-emerald-700">{pdfFileName}</span>
+                      <span className="text-xs text-emerald-500">Dados extraídos! Clique para enviar outro PDF.</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-5 w-5 text-slate-400" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-slate-600">Carregar PDF da autuação (SENATRAN)</span>
+                      <span className="text-xs text-slate-400">Os campos serão preenchidos automaticamente</span>
+                    </div>
+                  </>
+                )}
+              </label>
+            </div>
+
             {error && (
               <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100 flex items-center gap-3">
                 <AlertCircle className="h-4 w-4 shrink-0" />
