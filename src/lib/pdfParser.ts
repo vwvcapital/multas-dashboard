@@ -14,7 +14,6 @@ export interface DadosMultaPDF {
   Descricao?: string
   Codigo_Infracao?: string
   Valor?: string
-  Estado?: string
   Motorista?: string
   Expiracao_Indicacao?: string
 }
@@ -164,35 +163,6 @@ function parsearDadosMulta(items: string[]): DadosMultaPDF {
   )
   if (descricao) {
     dados.Descricao = descricao
-  }
-
-  // --- UF (na seção de local da infração) ---
-  // Procura "UF" após a seção de local
-  if (localIdx >= 0) {
-    for (let i = localIdx; i < Math.min(localIdx + 30, items.length); i++) {
-      if (/^UF$/i.test(items[i].trim())) {
-        let j = i + 1
-        while (j < items.length && items[j].trim() === '') j++
-        if (j < items.length) {
-          const uf = items[j].trim().toUpperCase()
-          if (/^[A-Z]{2}$/.test(uf)) {
-            dados.Estado = uf
-          }
-        }
-        break
-      }
-    }
-  }
-
-  // Fallback UF: tenta extrair do LOCAL DA INFRAÇÃO (ex: "MT - BR 158 - KM 571.00")
-  if (!dados.Estado) {
-    const localVal = encontrarValorAposLabel(items, /^LOCAL\s*DA\s*INFRA[CÇ][AÃ]O$/i)
-    if (localVal) {
-      const ufMatch = localVal.match(/^([A-Z]{2})\s*[-–]/)
-      if (ufMatch) {
-        dados.Estado = ufMatch[1]
-      }
-    }
   }
 
   // --- Motorista / Condutor ---

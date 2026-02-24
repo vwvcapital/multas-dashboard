@@ -85,7 +85,6 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
         if (dados.Descricao && !prev.Descricao) updated.Descricao = dados.Descricao
         if (dados.Codigo_Infracao && !prev.Codigo_Infracao) updated.Codigo_Infracao = dados.Codigo_Infracao
         if (dados.Valor && !prev.Valor) updated.Valor = dados.Valor
-        if (dados.Estado && !prev.Estado) updated.Estado = dados.Estado
         if (dados.Motorista && !prev.Motorista) {
           updated.Motorista = dados.Motorista
           updated.Resposabilidade = 'Motorista'
