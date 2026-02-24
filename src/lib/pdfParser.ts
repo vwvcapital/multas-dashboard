@@ -196,10 +196,14 @@ function parsearDadosMulta(items: string[]): DadosMultaPDF {
   }
 
   // --- Motorista / Condutor ---
-  // Na seção IDENTIFICAÇÃO DO CONDUTOR, procura NOME
-  const condutorIdx = items.findIndex(it => /IDENTIFICA[CÇ][AÃ]O\s*DO\s*CONDUTOR/i.test(it))
-  if (condutorIdx >= 0) {
-    for (let i = condutorIdx; i < Math.min(condutorIdx + 10, items.length); i++) {
+  // No PDF do SENATRAN, os dados do condutor (NOME, CNH, CPF) ficam
+  // entre a seção do veículo (após PLACA/MARCA) e "LOCAL DA INFRAÇÃO".
+  // O header "IDENTIFICAÇÃO DO CONDUTOR" aparece no topo do PDF como
+  // índice e não marca o início real dos dados.
+  const placaIdx = items.findIndex(it => /^PLACA$/i.test(it.trim()))
+  const localInfIdx = items.findIndex(it => /^LOCAL\s*DA\s*INFRA[CÇ][AÃ]O$/i.test(it.trim()))
+  if (placaIdx >= 0 && localInfIdx > placaIdx) {
+    for (let i = placaIdx; i < localInfIdx; i++) {
       if (/^NOME$/i.test(items[i].trim())) {
         let j = i + 1
         while (j < items.length && items[j].trim() === '') j++
