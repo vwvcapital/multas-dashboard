@@ -76,18 +76,23 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
       console.log('[PDF Upload] Dados extraídos:', dados)
 
       // Preencher apenas campos que foram encontrados (não sobrescrever dados já preenchidos)
-      setFormData(prev => ({
-        ...prev,
-        ...(dados.Auto_Infracao && !prev.Auto_Infracao ? { Auto_Infracao: dados.Auto_Infracao } : {}),
-        ...(dados.Veiculo && !prev.Veiculo ? { Veiculo: dados.Veiculo } : {}),
-        ...(dados.Data_Cometimento && !prev.Data_Cometimento ? { Data_Cometimento: dados.Data_Cometimento } : {}),
-        ...(dados.Hora_Cometimento && !prev.Hora_Cometimento ? { Hora_Cometimento: dados.Hora_Cometimento } : {}),
-        ...(dados.Descricao && !prev.Descricao ? { Descricao: dados.Descricao } : {}),
-        ...(dados.Codigo_Infracao && !prev.Codigo_Infracao ? { Codigo_Infracao: dados.Codigo_Infracao } : {}),
-        ...(dados.Valor && !prev.Valor ? { Valor: dados.Valor } : {}),
-        ...(dados.Estado && !prev.Estado ? { Estado: dados.Estado } : {}),
-        ...(dados.Motorista && !prev.Motorista ? { Motorista: dados.Motorista } : {}),
-      }))
+      setFormData(prev => {
+        const updated = { ...prev }
+        if (dados.Auto_Infracao && !prev.Auto_Infracao) updated.Auto_Infracao = dados.Auto_Infracao
+        if (dados.Veiculo && !prev.Veiculo) updated.Veiculo = dados.Veiculo
+        if (dados.Data_Cometimento && !prev.Data_Cometimento) updated.Data_Cometimento = dados.Data_Cometimento
+        if (dados.Hora_Cometimento && !prev.Hora_Cometimento) updated.Hora_Cometimento = dados.Hora_Cometimento
+        if (dados.Descricao && !prev.Descricao) updated.Descricao = dados.Descricao
+        if (dados.Codigo_Infracao && !prev.Codigo_Infracao) updated.Codigo_Infracao = dados.Codigo_Infracao
+        if (dados.Valor && !prev.Valor) updated.Valor = dados.Valor
+        if (dados.Estado && !prev.Estado) updated.Estado = dados.Estado
+        if (dados.Motorista && !prev.Motorista) {
+          updated.Motorista = dados.Motorista
+          updated.Resposabilidade = 'Motorista'
+        }
+        if (dados.Expiracao_Indicacao && !prev.Expiracao_Indicacao) updated.Expiracao_Indicacao = dados.Expiracao_Indicacao
+        return updated
+      })
     } catch (err) {
       console.error('[PDF Upload] Erro ao processar PDF:', err)
       setError('Erro ao processar o PDF. Verifique se o arquivo é válido.')

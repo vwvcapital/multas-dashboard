@@ -16,177 +16,227 @@ export interface DadosMultaPDF {
   Valor?: string
   Estado?: string
   Motorista?: string
+  Expiracao_Indicacao?: string
 }
 
 /**
- * Extrai texto de um arquivo PDF
+ * Extrai os itens de texto do PDF como array de strings (cada item de texto separado).
+ * PDFs do SENATRAN possuem labels e valores em itens separados, então
+ * a busca é feita por label → próximo item com conteúdo = valor.
  */
-async function extrairTextoPDF(file: File): Promise<string> {
+async function extrairItensPDF(file: File): Promise<string[]> {
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
 
-  let textoCompleto = ''
+  const allItems: string[] = []
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i)
     const textContent = await page.getTextContent()
-    const pageText = textContent.items
-      .map((item) => ('str' in item ? item.str : ''))
-      .join(' ')
-    textoCompleto += pageText + '\n'
+    for (const item of textContent.items) {
+      if ('str' in item) {
+        allItems.push(item.str)
+      }
+    }
   }
 
-  return textoCompleto
+  return allItems
 }
 
 /**
- * UFs brasileiras válidas
+ * Dado um array de itens de texto, encontra o valor que vem logo após o label informado.
+ * Pula itens vazios entre o label e o valor.
+ * Se `multiLine` for true, concatena linhas subsequentes não-vazias (para descrições longas).
  */
-const UFS_VALIDAS = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-  'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-  'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SE', 'SP', 'TO',
-]
+function encontrarValorAposLabel(
+  items: string[],
+  labelPattern: RegExp,
+  options: { multiLine?: boolean; stopPatterns?: RegExp[] } = {}
+): string | undefined {
+  for (let i = 0; i < items.length; i++) {
+    if (labelPattern.test(items[i])) {
+      // Encontrou o label, agora pega o próximo item não-vazio
+      let j = i + 1
+      while (j < items.length && items[j].trim() === '') {
+        j++
+      }
+      if (j >= items.length) return undefined
+
+      if (options.multiLine) {
+        // Concatena linhas até encontrar um stop pattern ou item vazio longo
+        const lines: string[] = []
+        while (j < items.length) {
+          const val = items[j].trim()
+          if (!val) break
+          // Verifica se é um novo label (stop pattern)
+          if (options.stopPatterns?.some(p => p.test(val))) break
+          lines.push(val)
+          j++
+        }
+        return lines.join(' ').trim() || undefined
+      }
+
+      return items[j].trim() || undefined
+    }
+  }
+  return undefined
+}
 
 /**
- * Faz o parse do texto extraído do PDF e tenta encontrar os dados da multa.
- * Adaptado para PDFs de Notificação de Autuação do SENATRAN / órgãos de trânsito.
+ * Faz o parse dos itens de texto do PDF do SENATRAN.
+ * Estrutura real: labels em um item, valores no item seguinte.
+ *
+ * Exemplo de sequência de itens:
+ *   "IDENTIFICAÇÃO DO AUTO DE INFRAÇÃO (Número do AIT)"
+ *   "N003735317"
+ *   "PLACA"
+ *   "SCA2D30"
+ *   "DATA"
+ *   "18/02/2026"
+ *   "HORA"
+ *   "06:23"
+ *   etc.
  */
-function parsearDadosMulta(texto: string): DadosMultaPDF {
+function parsearDadosMulta(items: string[]): DadosMultaPDF {
   const dados: DadosMultaPDF = {}
 
-  // Normalizar espaços múltiplos
-  const t = texto.replace(/\s+/g, ' ')
-
-  // --- Auto de Infração ---
-  // Padrões comuns: "Auto de Infração: XXXXX", "Nº Auto: XXXXX", "AIT: XXXXX"
-  const autoPatterns = [
-    /auto\s*(?:de)?\s*(?:infra[çc][ãa]o)\s*[:\-–]?\s*([A-Z0-9]{5,20})/i,
-    /(?:n[ºo°]?\s*)?(?:auto|ait)\s*[:\-–]?\s*([A-Z0-9]{5,20})/i,
-    /(?:AIT|auto)\s+([A-Z]{1,3}\d{5,})/i,
+  // Stop patterns comuns (labels que indicam início de outro campo)
+  const stopLabels = [
+    /^MEDI[CÇ][AÃ]O\s*REALIZADA/i,
+    /^VALOR\s*CONSIDERADO/i,
+    /^LIMITE\s*REGULAMENTADO/i,
+    /^N[UÚ]MERO\s*RENAINF/i,
+    /^OBSERVA[CÇ][OÕ]ES/i,
+    /^LOCAL/i,
+    /^IDENTIFICA[CÇ][AÃ]O/i,
   ]
-  for (const pattern of autoPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      dados.Auto_Infracao = match[1].trim()
-      break
-    }
-  }
 
-  // --- Placa do Veículo ---
-  // Formatos: ABC1234 ou ABC1D23 (Mercosul)
-  const placaPatterns = [
-    /(?:placa|ve[ií]culo)\s*[:\-–]?\s*([A-Z]{3}\s*[-]?\s*\d[A-Z0-9]\d{2})/i,
-    /\b([A-Z]{3}\s*[-]?\s*\d[A-Z0-9]\d{2})\b/i,
-  ]
-  for (const pattern of placaPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      dados.Veiculo = match[1].replace(/[\s-]/g, '').toUpperCase()
-      break
-    }
-  }
+  // --- Auto de Infração (Número do AIT) ---
+  dados.Auto_Infracao = encontrarValorAposLabel(
+    items,
+    /IDENTIFICA[CÇ][AÃ]O\s*DO\s*AUTO\s*DE\s*INFRA[CÇ][AÃ]O/i
+  )
 
-  // --- Data do Cometimento ---
-  const dataPatterns = [
-    /(?:data\s*(?:da)?\s*(?:infra[çc][ãa]o|cometimento|ocorr[êe]ncia))\s*[:\-–]?\s*(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})/i,
-    /(?:data)\s*[:\-–]?\s*(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})/i,
-  ]
-  for (const pattern of dataPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      dados.Data_Cometimento = match[1].replace(/[\-\.]/g, '/')
-      break
-    }
-  }
+  // --- Placa ---
+  dados.Veiculo = encontrarValorAposLabel(items, /^PLACA$/i)
 
-  // --- Hora do Cometimento ---
-  const horaPatterns = [
-    /(?:hora|hor[áa]rio)\s*(?:da\s*(?:infra[çc][ãa]o))?\s*[:\-–]?\s*(\d{2}[:\-]\d{2})/i,
-    /(\d{2}:\d{2})\s*(?:h|hs|hrs)/i,
-  ]
-  for (const pattern of horaPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      dados.Hora_Cometimento = match[1].replace('-', ':')
-      break
+  // --- Data do cometimento (na seção LOCAL, DATA E HORA) ---
+  // Procuro especificamente o "DATA" que vem depois de "LOCAL DA INFRAÇÃO"
+  // Para evitar pegar outras datas (notificação, limite defesa, etc.)
+  const localIdx = items.findIndex(it => /LOCAL\s*DA\s*INFRA[CÇ][AÃ]O/i.test(it))
+  if (localIdx >= 0) {
+    // Dentro da seção de local, procura DATA e HORA
+    for (let i = localIdx; i < Math.min(localIdx + 20, items.length); i++) {
+      if (/^DATA$/i.test(items[i].trim())) {
+        // Próximo item não-vazio é o valor
+        let j = i + 1
+        while (j < items.length && items[j].trim() === '') j++
+        if (j < items.length && /\d{2}\/\d{2}\/\d{4}/.test(items[j])) {
+          dados.Data_Cometimento = items[j].trim()
+        }
+      }
+      if (/^HORA$/i.test(items[i].trim())) {
+        let j = i + 1
+        while (j < items.length && items[j].trim() === '') j++
+        if (j < items.length && /\d{2}:\d{2}/.test(items[j])) {
+          dados.Hora_Cometimento = items[j].trim()
+        }
+      }
     }
   }
 
   // --- Código da Infração ---
-  const codigoPatterns = [
-    /(?:c[óo]d(?:igo)?\.?\s*(?:da)?\s*(?:infra[çc][ãa]o)?|enquadramento|amparo\s*legal)\s*[:\-–]?\s*(\d{3,5}(?:\s*[-\/]\s*\d{1,2})?)/i,
-    /(?:art(?:igo)?\.?\s*\d+|infra[çc][ãa]o)\s*[:\-–]?\s*(\d{3,5})/i,
-  ]
-  for (const pattern of codigoPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      // Pegar apenas os dígitos principais
-      dados.Codigo_Infracao = match[1].replace(/\D/g, '').slice(0, 5)
-      break
-    }
-  }
-
-  // --- Descrição da Infração ---
-  const descPatterns = [
-    /(?:descri[çc][ãa]o\s*(?:da)?\s*(?:infra[çc][ãa]o)?)\s*[:\-–]?\s*(.{10,200}?)(?=\s*(?:local|valor|c[óo]d|enquadramento|amparo|medida|observ|penalidade|artigo|art\.))/i,
-    /(?:infra[çc][ãa]o\s*cometida)\s*[:\-–]?\s*(.{10,200}?)(?=\s*(?:local|valor|c[óo]d|enquadramento))/i,
-  ]
-  for (const pattern of descPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      dados.Descricao = match[1].trim()
-      break
-    }
-  }
+  dados.Codigo_Infracao = encontrarValorAposLabel(
+    items,
+    /^C[OÓ]DIGO\s*DA\s*INFRA[CÇ][AÃ]O$/i
+  )
 
   // --- Valor da Multa ---
-  const valorPatterns = [
-    /(?:valor\s*(?:da)?\s*(?:multa|infra[çc][ãa]o|auto)?)\s*[:\-–]?\s*R?\$?\s*([\d.,]+)/i,
-    /R\$\s*([\d.,]+)/i,
-  ]
-  for (const pattern of valorPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      // Formatar como "R$ xxx,xx"
-      let valor = match[1].trim()
-      // Se tem ponto como milhar e vírgula como decimal: 1.234,56
-      if (valor.includes('.') && valor.includes(',')) {
-        // Já formatado
-      } else if (valor.includes(',')) {
-        // Apenas vírgula decimal: 234,56
-      } else if (valor.includes('.')) {
-        // Ponto como decimal (raro em PT-BR, mas possível)
-        valor = valor.replace('.', ',')
-      }
-      dados.Valor = `R$ ${valor}`
-      break
-    }
+  const valorRaw = encontrarValorAposLabel(items, /^VALOR\s*DA\s*MULTA$/i)
+  if (valorRaw) {
+    dados.Valor = valorRaw
   }
 
-  // --- Estado / UF ---
-  const ufPatterns = [
-    /(?:UF|estado|unidade\s*federativa)\s*[:\-–]?\s*([A-Z]{2})\b/i,
-    /\b([A-Z]{2})\s*[-–]\s*\d{3,}/,
-  ]
-  for (const pattern of ufPatterns) {
-    const match = t.match(pattern)
-    if (match) {
-      const uf = match[1].toUpperCase()
-      if (UFS_VALIDAS.includes(uf)) {
-        dados.Estado = uf
+  // --- Descrição da Infração (pode ocupar múltiplas linhas) ---
+  const descricao = encontrarValorAposLabel(
+    items,
+    /^DESCRI[CÇ][AÃ]O\s*DA\s*INFRA[CÇ][AÃ]O$/i,
+    { multiLine: true, stopPatterns: stopLabels }
+  )
+  if (descricao) {
+    dados.Descricao = descricao
+  }
+
+  // --- UF (na seção de local da infração) ---
+  // Procura "UF" após a seção de local
+  if (localIdx >= 0) {
+    for (let i = localIdx; i < Math.min(localIdx + 30, items.length); i++) {
+      if (/^UF$/i.test(items[i].trim())) {
+        let j = i + 1
+        while (j < items.length && items[j].trim() === '') j++
+        if (j < items.length) {
+          const uf = items[j].trim().toUpperCase()
+          if (/^[A-Z]{2}$/.test(uf)) {
+            dados.Estado = uf
+          }
+        }
         break
       }
     }
   }
 
-  // Se não encontrou UF nos padrões acima, procura menção no texto
+  // Fallback UF: tenta extrair do LOCAL DA INFRAÇÃO (ex: "MT - BR 158 - KM 571.00")
   if (!dados.Estado) {
-    for (const uf of UFS_VALIDAS) {
-      const ufRegex = new RegExp(`\\b${uf}\\b`)
-      if (ufRegex.test(t)) {
-        dados.Estado = uf
+    const localVal = encontrarValorAposLabel(items, /^LOCAL\s*DA\s*INFRA[CÇ][AÃ]O$/i)
+    if (localVal) {
+      const ufMatch = localVal.match(/^([A-Z]{2})\s*[-–]/)
+      if (ufMatch) {
+        dados.Estado = ufMatch[1]
+      }
+    }
+  }
+
+  // --- Motorista / Condutor ---
+  // Na seção IDENTIFICAÇÃO DO CONDUTOR, procura NOME
+  const condutorIdx = items.findIndex(it => /IDENTIFICA[CÇ][AÃ]O\s*DO\s*CONDUTOR/i.test(it))
+  if (condutorIdx >= 0) {
+    for (let i = condutorIdx; i < Math.min(condutorIdx + 10, items.length); i++) {
+      if (/^NOME$/i.test(items[i].trim())) {
+        let j = i + 1
+        while (j < items.length && items[j].trim() === '') j++
+        if (j < items.length) {
+          const nome = items[j].trim()
+          if (nome && !/n[ãa]o\s*dispon[ií]vel/i.test(nome)) {
+            dados.Motorista = nome
+          }
+        }
         break
       }
+    }
+  }
+
+  // --- Data limite para indicação do condutor infrator ---
+  dados.Expiracao_Indicacao = encontrarValorAposLabel(
+    items,
+    /DATA\s*LIMITE\s*PARA\s*IDENTIFICA[CÇ][AÃ]O\s*DO\s*CONDUTOR/i
+  )
+
+  // --- Observações: pode conter descrição complementar ---
+  // As observações no PDF do SENATRAN muitas vezes trazem detalhes extras da infração
+  // Se a descrição parecer incompleta, complementamos com as observações
+  const obsIdx = items.findIndex(it => /^OBSERVA[CÇ][OÕ]ES$/i.test(it.trim()))
+  if (obsIdx >= 0) {
+    const obsLines: string[] = []
+    let j = obsIdx + 1
+    while (j < items.length) {
+      const val = items[j].trim()
+      if (!val) break
+      // Parar se encontrar outro label de seção
+      if (/^EMBARCADOR|^IDENTIFICA[CÇ][AÃ]O|^N[UÚ]MERO|^REGISTRO/i.test(val)) break
+      obsLines.push(val)
+      j++
+    }
+    if (obsLines.length > 0 && dados.Descricao) {
+      dados.Descricao = dados.Descricao + ' - ' + obsLines.join(' ')
     }
   }
 
@@ -194,10 +244,13 @@ function parsearDadosMulta(texto: string): DadosMultaPDF {
 }
 
 /**
- * Função principal: recebe um arquivo PDF e retorna os dados extraídos
+ * Função principal: recebe um arquivo PDF e retorna os dados extraídos.
+ * Otimizado para PDFs de Notificação de Autuação do SENATRAN.
  */
 export async function extrairDadosMultaPDF(file: File): Promise<DadosMultaPDF> {
-  const texto = await extrairTextoPDF(file)
-  console.log('[PDF Parser] Texto extraído:', texto)
-  return parsearDadosMulta(texto)
+  const items = await extrairItensPDF(file)
+  console.log('[PDF Parser] Itens extraídos:', items.filter(i => i.trim()))
+  const dados = parsearDadosMulta(items)
+  console.log('[PDF Parser] Dados parseados:', dados)
+  return dados
 }
