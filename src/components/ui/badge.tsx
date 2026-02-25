@@ -8,22 +8,22 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary/10 text-primary",
+          "border-transparent bg-primary/10 text-primary dark:bg-primary/20",
         secondary:
-          "border-transparent bg-slate-100 text-slate-600",
+          "border-transparent bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
         destructive:
-          "border-transparent bg-red-50 text-red-600",
+          "border-transparent bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400",
         success:
-          "border-transparent bg-emerald-50 text-emerald-600",
+          "border-transparent bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
         warning:
-          "border-transparent bg-amber-50 text-amber-600",
+          "border-transparent bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
         purple:
-          "border-transparent bg-purple-50 text-purple-600",
+          "border-transparent bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
         cyan:
-          "border-transparent bg-cyan-50 text-cyan-600",
+          "border-transparent bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400",
         blue:
-          "border-transparent bg-blue-50 text-blue-600",
-        outline: "border-2 border-slate-200 text-slate-600 bg-white",
+          "border-transparent bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+        outline: "border-2 border-slate-200 text-slate-600 bg-white dark:border-slate-600 dark:text-slate-300 dark:bg-slate-800",
       },
     },
     defaultVariants: {

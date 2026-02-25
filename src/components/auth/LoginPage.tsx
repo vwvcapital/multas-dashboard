@@ -37,7 +37,7 @@ export function LoginPage() {
       {/* Grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
       
-      <Card className="w-full max-w-md relative bg-white/95 backdrop-blur-xl shadow-2xl border-0">
+      <Card className="w-full max-w-md relative bg-white/95 backdrop-blur-xl shadow-2xl border-0 dark:bg-slate-800/95">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-6">
             <div className="relative">
@@ -49,7 +49,7 @@ export function LoginPage() {
               </div>
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
             Comelli Transportes
           </CardTitle>
           <p className="text-muted-foreground mt-1">Sistema de Gestão de Multas</p>
@@ -66,7 +66,7 @@ export function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Usuário</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Usuário</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
@@ -82,7 +82,7 @@ export function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Senha</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input

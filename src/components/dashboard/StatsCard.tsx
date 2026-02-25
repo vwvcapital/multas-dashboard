@@ -24,19 +24,19 @@ export function StatsCard({
 }: StatsCardProps) {
   const variantStyles = {
     default: {
-      icon: 'bg-blue-50 text-blue-600',
+      icon: 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400',
       gradient: 'from-blue-500/10 via-transparent to-transparent'
     },
     warning: {
-      icon: 'bg-amber-50 text-amber-600',
+      icon: 'bg-amber-50 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400',
       gradient: 'from-amber-500/10 via-transparent to-transparent'
     },
     success: {
-      icon: 'bg-emerald-50 text-emerald-600',
+      icon: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400',
       gradient: 'from-emerald-500/10 via-transparent to-transparent'
     },
     destructive: {
-      icon: 'bg-red-50 text-red-600',
+      icon: 'bg-red-50 text-red-600 dark:bg-red-900/40 dark:text-red-400',
       gradient: 'from-red-500/10 via-transparent to-transparent'
     }
   }
@@ -54,7 +54,7 @@ export function StatsCard({
             <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
               {title}
             </p>
-            <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-1 text-slate-900 truncate">
+            <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-1 text-slate-900 truncate dark:text-slate-100">
               {value}
             </p>
             {description && (

@@ -27,7 +27,7 @@ export function MultasChart({ data, title, color = '#3b82f6' }: MultasChartProps
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2.5 text-base sm:text-lg">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40">
             <BarChart3 className="h-4 w-4 text-blue-600" />
           </div>
           {title}
@@ -71,13 +71,13 @@ export function MultasChart({ data, title, color = '#3b82f6' }: MultasChartProps
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  backgroundColor: 'var(--color-card)', 
                   border: 'none',
                   borderRadius: '12px',
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
                   padding: '12px 16px'
                 }}
-                labelStyle={{ color: '#0f172a', fontWeight: 600, marginBottom: '4px' }}
+                labelStyle={{ color: 'var(--color-foreground)', fontWeight: 600, marginBottom: '4px' }}
                 itemStyle={{ color: '#64748b' }}
                 cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
               />

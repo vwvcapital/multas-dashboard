@@ -188,7 +188,7 @@ function TagInput({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose: (
           if (e.key === 'Escape') onClose()
         }}
         placeholder="Nova tag..."
-        className="h-6 px-2 text-[11px] border border-slate-200 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary/40 w-24"
+        className="h-6 px-2 text-[11px] border border-slate-200 rounded-md bg-white focus:outline-none dark:bg-slate-700 dark:border-slate-500 dark:text-slate-200 focus:ring-1 focus:ring-primary/40 w-24"
       />
       <button
         onClick={handleSubmit}
@@ -283,7 +283,7 @@ function KanbanCard({
           <div className={`flex items-center justify-center w-6 h-6 rounded-lg ${columnColors.iconBg} shrink-0`}>
             <Truck className={`h-3.5 w-3.5 ${columnColors.iconText}`} />
           </div>
-          <span className="font-extrabold text-base text-slate-900 tracking-tight truncate">{multa.Veiculo}</span>
+          <span className="font-extrabold text-base text-slate-900 dark:text-slate-100 tracking-tight truncate">{multa.Veiculo}</span>
         </div>
 
         {/* Auto de Infração */}
@@ -295,7 +295,7 @@ function KanbanCard({
         {/* Motorista */}
         <div className="flex items-center gap-1.5 mb-2 text-xs">
           <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-          <span className="text-slate-700 font-medium truncate">{multa.Motorista}</span>
+          <span className="text-slate-700 dark:text-slate-300 font-medium truncate">{multa.Motorista}</span>
         </div>
 
         {/* Responsabilidade */}
@@ -336,7 +336,7 @@ function KanbanCard({
                   e.stopPropagation()
                   setIsEditingNote(true)
                 }}
-                className="h-6 w-6 rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors inline-flex items-center justify-center"
+                className="h-6 w-6 rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors inline-flex items-center justify-center"
                 title="Editar nota"
               >
                 <Pencil className="h-3 w-3" />
@@ -345,7 +345,7 @@ function KanbanCard({
           </div>
 
           {nota ? (
-            <p className="text-xs text-slate-700 leading-relaxed line-clamp-3">{nota}</p>
+            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-3">{nota}</p>
           ) : (
             <div className="space-y-1.5 py-0.5">
               <div className="h-2 rounded bg-slate-200/80 w-[92%]" />
@@ -430,18 +430,18 @@ function KanbanCard({
           }}
         >
           <div
-            className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 sm:p-5"
+            className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-slate-800 dark:border-slate-600 sm:p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-slate-900">Editar nota da multa</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Editar nota da multa</h3>
             <p className="text-xs text-slate-500 mt-1 truncate">{multa.Veiculo} • {multa.Auto_Infracao}</p>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-300 min-w-0">
                 <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{multa.Motorista || 'Sem motorista'}</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-300 min-w-0">
                 <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{multa.Data_Cometimento || 'Sem data'}</span>
               </div>
@@ -476,7 +476,7 @@ function KanbanCard({
                 value={noteDraft}
                 onChange={(e) => setNoteDraft(e.target.value)}
                 rows={10}
-                className="w-full min-h-[300px] rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-slate-700 resize-y focus:outline-none focus:ring-1 focus:ring-amber-300"
+                className="w-full min-h-[300px] rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-200 resize-y focus:outline-none focus:ring-1 focus:ring-amber-300"
                 placeholder="Digite uma nota..."
               />
               <div className="flex items-center justify-end gap-2">
@@ -835,11 +835,11 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
               onDrop={(e) => handleDrop(e, column.id)}
             >
               {/* Column Header — sticky on desktop page scroll */}
-              <div className="sticky top-16 z-30 p-3 pb-2 bg-white/95 backdrop-blur-sm border-b border-slate-200 rounded-t-2xl shadow-sm">
+              <div className="sticky top-16 z-30 p-3 pb-2 bg-white/95 backdrop-blur-sm border-b border-slate-200 rounded-t-2xl dark:bg-slate-800/95 dark:border-slate-600 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-3 h-3 rounded-full ${column.color}`} />
                   <h3 className={`font-bold text-sm ${column.textColor}`}>{column.label}</h3>
-                  <span className="ml-auto text-xs font-semibold bg-white rounded-full px-2.5 py-0.5 text-slate-600 shadow-sm border">
+                  <span className="ml-auto text-xs font-semibold bg-white rounded-full px-2.5 py-0.5 text-slate-600 shadow-sm border dark:bg-slate-700 dark:text-slate-300 dark:border-slate-500">
                     {columnMultas.length}
                   </span>
                 </div>
@@ -916,24 +916,24 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
 
       {pendingStatusChange && (
         <div className="fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-[1px] flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 sm:p-5">
-            <h3 className="text-base font-bold text-slate-900">Confirmar mudança de status</h3>
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-slate-800 dark:border-slate-600 sm:p-5">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Confirmar mudança de status</h3>
             <p className="text-sm text-slate-600 mt-1">
               Confira os dados abaixo antes de mover a multa.
             </p>
 
             <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-              <div className="text-sm font-semibold text-slate-800 truncate">{pendingStatusChange.multa.Veiculo}</div>
+              <div className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{pendingStatusChange.multa.Veiculo}</div>
               <div className="text-xs text-slate-600 font-mono truncate">{pendingStatusChange.multa.Auto_Infracao}</div>
               <div className="text-xs text-slate-600 truncate">{pendingStatusChange.multa.Motorista}</div>
               <div className="text-xs font-semibold text-emerald-700">{pendingStatusChange.multa.Valor_Boleto || pendingStatusChange.multa.Valor}</div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-slate-200 p-3 bg-white">
+            <div className="mt-4 rounded-xl border border-slate-200 p-3 bg-white dark:bg-slate-700 dark:border-slate-600">
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className={`w-2.5 h-2.5 rounded-full ${getColumnById(pendingStatusChange.multa.Status_Boleto)?.color || 'bg-slate-400'}`} />
-                  <span className="font-medium text-slate-700 truncate">{pendingStatusChange.multa.Status_Boleto}</span>
+                  <span className="font-medium text-slate-700 dark:text-slate-300 truncate">{pendingStatusChange.multa.Status_Boleto}</span>
                 </div>
                 <span className="text-slate-400">→</span>
                 <div className="flex items-center gap-2 min-w-0">

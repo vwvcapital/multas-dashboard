@@ -122,7 +122,7 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
       </Button>
       {open && createPortal(
         <div
-          className="fixed w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-[9999] animate-in fade-in-0 zoom-in-95"
+          className="fixed w-48 bg-white rounded-lg shadow-lg border dark:bg-slate-800 dark:border-slate-600 border-slate-200 py-1 z-[9999] animate-in fade-in-0 zoom-in-95"
           style={{ top: menuPos.top, left: menuPos.left }}
         >
           {actions.map((action, i) => (
@@ -241,7 +241,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div className="font-medium text-slate-700">{multa.Data_Cometimento || '-'}</div>
+                        <div className="font-medium text-slate-700 dark:text-slate-300">{multa.Data_Cometimento || '-'}</div>
                         <div className="text-muted-foreground text-xs">{multa.Hora_Cometimento}</div>
                       </div>
                     </TableCell>
@@ -251,7 +251,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                     <TableCell>
                       <Badge variant="outline" className="text-[10px]">{multa.Estado || '-'}</Badge>
                     </TableCell>
-                    <TableCell className="text-right font-medium text-slate-700">
+                    <TableCell className="text-right font-medium text-slate-700 dark:text-slate-300">
                       {multa.Valor || '-'}
                     </TableCell>
                     <TableCell className="text-right font-bold text-blue-600">

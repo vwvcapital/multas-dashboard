@@ -120,7 +120,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
       <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2.5 text-base sm:text-lg">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/40">
               <Users className="h-4 w-4 text-amber-600" />
             </div>
             Responsabilidade
@@ -184,7 +184,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
               </Pie>
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  backgroundColor: 'var(--color-card)', 
                   border: 'none',
                   borderRadius: '12px',
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
@@ -217,7 +217,7 @@ export function ResponsibilityChart({ multas }: ResponsibilityChartProps) {
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  backgroundColor: 'var(--color-card)', 
                   border: 'none',
                   borderRadius: '12px',
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',

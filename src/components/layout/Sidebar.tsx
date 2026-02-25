@@ -64,8 +64,8 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
   const sidebarContent = (
     <>
       {/* Mobile close button */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b">
-        <span className="font-semibold text-slate-900">Menu</span>
+      <div className="lg:hidden flex items-center justify-between p-4 border-b dark:border-slate-700">
+        <span className="font-semibold text-slate-900 dark:text-slate-100">Menu</span>
         <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
           <X className="h-5 w-5" />
         </Button>
@@ -105,7 +105,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
                 collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
                 isActive 
                   ? "bg-primary text-white shadow-lg shadow-primary/25" 
-                  : "text-slate-600 hover:bg-slate-100"
+                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
               )}
             >
               <div className={cn(
@@ -120,7 +120,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
                   "text-xs font-semibold px-2.5 py-1 rounded-full transition-colors min-w-[24px] text-center",
                   isActive 
                     ? "bg-white/20 text-white" 
-                    : "bg-slate-200 text-slate-700"
+                    : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                 )}>
                   {item.count}
                 </span>
@@ -131,14 +131,14 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
       </nav>
 
       {/* Footer info - fixo na parte inferior */}
-      <div className="shrink-0 p-4 border-t bg-slate-50/50">
+      <div className="shrink-0 p-4 border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700">
         {/* Botão de Logs - para todos os usuários */}
         {onOpenLogs && (
           <button
             onClick={onOpenLogs}
             title={collapsed ? 'Histórico' : undefined}
             className={cn(
-              "w-full flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 mb-3",
+              "w-full flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 mb-3 dark:text-slate-400 dark:hover:bg-slate-800",
               collapsed ? "justify-center" : "gap-3"
             )}
           >
@@ -151,7 +151,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
         {!collapsed && (
           <div className="text-xs text-center text-muted-foreground">
             <p>Sistema de Gestão de Multas</p>
-            <p className="mt-1 font-medium text-slate-500">© 2026 Comelli Transportes</p>
+            <p className="mt-1 font-medium text-slate-500 dark:text-slate-500">© 2026 Comelli Transportes</p>
           </div>
         )}
       </div>
@@ -170,7 +170,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
       
       {/* Mobile Drawer */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-out lg:hidden flex flex-col",
+        "fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-out lg:hidden flex flex-col dark:bg-slate-900",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {sidebarContent}
@@ -178,7 +178,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
 
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden lg:flex flex-col border-r bg-white/80 backdrop-blur-sm fixed top-16 left-0 h-[calc(100vh-4rem)] z-30 transition-all duration-300",
+        "hidden lg:flex flex-col border-r bg-white/80 backdrop-blur-sm fixed top-16 left-0 h-[calc(100vh-4rem)] z-30 transition-all duration-300 dark:bg-slate-900/80 dark:border-slate-700",
         collapsed ? "w-20" : "w-72",
         className
       )}>

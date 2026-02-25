@@ -61,7 +61,7 @@ export function MultasPeriodChart({ multas }: MultasPeriodChartProps) {
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2.5 text-base sm:text-lg">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/40">
             <TrendingUp className="h-4 w-4 text-emerald-600" />
           </div>
           Multas por Período
@@ -103,13 +103,13 @@ export function MultasPeriodChart({ multas }: MultasPeriodChartProps) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backgroundColor: 'var(--color-card)',
                   border: 'none',
                   borderRadius: '12px',
                   boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
                   padding: '12px 16px'
                 }}
-                labelStyle={{ color: '#0f172a', fontWeight: 600, marginBottom: '4px' }}
+                labelStyle={{ color: 'var(--color-foreground)', fontWeight: 600, marginBottom: '4px' }}
                 formatter={(value) => [`${value} multa(s)`, 'Quantidade']}
               />
               <Area

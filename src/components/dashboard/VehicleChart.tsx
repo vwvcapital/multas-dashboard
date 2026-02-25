@@ -124,7 +124,7 @@ export function VehicleChart({ multas, topN = 10 }: VehicleChartProps) {
       <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="flex items-center gap-2.5 text-base sm:text-lg">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40">
               <Truck className="h-4 w-4 text-blue-600" />
             </div>
             Top {topN} Veículos
@@ -179,14 +179,14 @@ export function VehicleChart({ multas, topN = 10 }: VehicleChartProps) {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backgroundColor: 'var(--color-card)',
                     border: 'none',
                     borderRadius: '12px',
                     boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15)',
                     padding: '12px 16px'
                   }}
                   formatter={(value) => [`${value} multa(s)`, 'Quantidade']}
-                  labelStyle={{ color: '#0f172a', fontWeight: 600, marginBottom: '4px' }}
+                  labelStyle={{ color: 'var(--color-foreground)', fontWeight: 600, marginBottom: '4px' }}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={25}>
                   {chartData.map((entry, index) => (

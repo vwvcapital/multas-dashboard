@@ -476,7 +476,7 @@ function App() {
   // Loading de autenticação
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
         <div className="text-center">
           <div className="relative">
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-xl shadow-primary/30 mx-auto">
@@ -495,7 +495,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 overflow-x-hidden dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <Header 
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} 
         isSidebarOpen={isSidebarOpen} 
@@ -584,7 +584,7 @@ function App() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
                     {viewTitles[currentView].title}
                   </h2>
                   <p className="text-muted-foreground mt-1">
@@ -733,41 +733,41 @@ function App() {
             {/* Card de Resumo - Próximo ao Vencimento */}
             {currentView === 'vencimento' && !loading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50">
+                <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 dark:border-orange-900/50 dark:from-orange-900/20 dark:to-amber-900/20">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-orange-100">
-                        <AlertTriangle className="h-6 w-6 text-orange-600" />
+                      <div className="p-3 rounded-xl bg-orange-100 dark:bg-orange-900/50">
+                        <AlertTriangle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Multas a Vencer</p>
-                        <p className="text-2xl font-bold text-orange-700">{multasProximoVencimento.length}</p>
+                        <p className="text-2xl font-bold text-orange-700 dark:text-orange-400">{multasProximoVencimento.length}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 dark:border-blue-900/50 dark:from-blue-900/20 dark:to-indigo-900/20">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-blue-100">
-                        <DollarSign className="h-6 w-6 text-blue-600" />
+                      <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/50">
+                        <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Valor das Multas</p>
-                        <p className="text-2xl font-bold text-blue-700">{formatValor(stats.valorMultaVencimento)}</p>
+                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{formatValor(stats.valorMultaVencimento)}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 sm:col-span-2 lg:col-span-1">
+                <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 sm:col-span-2 lg:col-span-1 dark:border-emerald-900/50 dark:from-emerald-900/20 dark:to-teal-900/20">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-emerald-100">
-                        <FileWarning className="h-6 w-6 text-emerald-600" />
+                      <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-900/50">
+                        <FileWarning className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Valor dos Boletos</p>
-                        <p className="text-2xl font-bold text-emerald-700">{formatValor(stats.valorBoletoVencimento)}</p>
+                        <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{formatValor(stats.valorBoletoVencimento)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -778,41 +778,41 @@ function App() {
             {/* Card de Resumo - Todas as Multas */}
             {currentView === 'todas' && !loading && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50">
+                <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50 dark:border-slate-700 dark:from-slate-800/50 dark:to-gray-800/50">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-slate-100">
-                        <FileWarning className="h-6 w-6 text-slate-600" />
+                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-700">
+                        <FileWarning className="h-6 w-6 text-slate-600 dark:text-slate-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Total de Multas</p>
-                        <p className="text-2xl font-bold text-slate-700">{filteredTotals.quantidade}</p>
+                        <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">{filteredTotals.quantidade}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 dark:border-blue-900/50 dark:from-blue-900/20 dark:to-indigo-900/20">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-blue-100">
-                        <DollarSign className="h-6 w-6 text-blue-600" />
+                      <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/50">
+                        <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Valor das Multas</p>
-                        <p className="text-2xl font-bold text-blue-700">{formatValor(filteredTotals.valorMultas)}</p>
+                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{formatValor(filteredTotals.valorMultas)}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50">
+                <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 dark:border-emerald-900/50 dark:from-emerald-900/20 dark:to-teal-900/20">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-emerald-100">
-                        <Receipt className="h-6 w-6 text-emerald-600" />
+                      <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-900/50">
+                        <Receipt className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Boletos Disponíveis ({filteredTotals.qtdDisponiveis})</p>
-                        <p className="text-2xl font-bold text-emerald-700">{formatValor(filteredTotals.valorBoletos)}</p>
+                        <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{formatValor(filteredTotals.valorBoletos)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -854,7 +854,7 @@ function App() {
                   )}
                   
                   {/* Sort Select */}
-                  <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2">
+                  <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2 dark:bg-slate-800 dark:border-slate-600">
                     <ArrowUpDown className="h-4 w-4 text-slate-400" />
                     <Select
                       options={sortOptions}
@@ -865,17 +865,17 @@ function App() {
                   </div>
                   
                   {/* Toggle View Mode */}
-                  <div className="flex items-center bg-white border-2 border-slate-200 rounded-xl overflow-hidden">
+                  <div className="flex items-center bg-white border-2 border-slate-200 rounded-xl overflow-hidden dark:bg-slate-800 dark:border-slate-600">
                     <button
                       onClick={() => setDisplayMode('list')}
-                      className={`p-2.5 transition-all duration-200 ${displayMode === 'list' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50'}`}
+                      className={`p-2.5 transition-all duration-200 ${displayMode === 'list' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                       title="Visualizar em lista"
                     >
                       <List className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setDisplayMode('cards')}
-                      className={`p-2.5 transition-all duration-200 ${displayMode === 'cards' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50'}`}
+                      className={`p-2.5 transition-all duration-200 ${displayMode === 'cards' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                       title="Visualizar em cards"
                     >
                       <LayoutGrid className="h-4 w-4" />
@@ -928,7 +928,7 @@ function App() {
                 </div>
               ) : (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-slate-800">
+                    <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-200">
                     {viewTitles[currentView].title} 
                     <span className="text-muted-foreground font-normal ml-2">({sortedFilteredMultas.length})</span>
                   </h3>
