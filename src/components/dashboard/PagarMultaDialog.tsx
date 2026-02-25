@@ -83,7 +83,7 @@ export function PagarMultaDialog({ multa, onClose, onConfirm }: PagarMultaDialog
             <div className="bg-slate-50 rounded-xl p-4 space-y-3 border border-slate-100">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Auto de Infração:</span>
-                <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{multa.Auto_Infracao}</span>
+                <span className="font-mono font-medium text-slate-700 dark:text-neutral-300">{multa.Auto_Infracao}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Veículo:</span>
@@ -91,7 +91,7 @@ export function PagarMultaDialog({ multa, onClose, onConfirm }: PagarMultaDialog
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Motorista:</span>
-                <span className="text-slate-700 dark:text-slate-300">{multa.Motorista}</span>
+                <span className="text-slate-700 dark:text-neutral-300">{multa.Motorista}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Valor Boleto:</span>
@@ -101,7 +101,7 @@ export function PagarMultaDialog({ multa, onClose, onConfirm }: PagarMultaDialog
 
             {/* Campo do Comprovante */}
             <div className="space-y-2">
-              <label htmlFor="comprovante" className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+              <label htmlFor="comprovante" className="text-sm font-medium text-slate-700 dark:text-neutral-300 flex items-center gap-2">
                 <Link className="h-4 w-4" />
                 Link do Comprovante de Pagamento *
               </label>

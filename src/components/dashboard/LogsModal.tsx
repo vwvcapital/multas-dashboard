@@ -84,15 +84,15 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
       />
 
       {/* Modal */}
-      <div className="fixed inset-4 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl sm:max-h-[80vh] bg-white rounded-2xl shadow-2xl dark:bg-slate-800 z-50 flex flex-col animate-in zoom-in-95">
+      <div className="fixed inset-4 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl sm:max-h-[80vh] bg-white rounded-2xl shadow-2xl dark:bg-neutral-950 z-50 flex flex-col animate-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b shrink-0 dark:border-slate-700">
+        <div className="flex items-center justify-between p-4 border-b shrink-0 dark:border-neutral-800">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-indigo-100">
               <History className="h-5 w-5 text-indigo-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Histórico de Atividades</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-neutral-100">Histórico de Atividades</h2>
               <p className="text-sm text-muted-foreground">
                 {isAdmin ? 'Registro de ações de todos os usuários' : `Suas ações como ${getRoleLabel(userRole || '')}`}
               </p>
@@ -116,10 +116,10 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
 
         {/* Filters - only for admin */}
         {isAdmin && (
-          <div className="p-4 border-b bg-slate-50/50 shrink-0 dark:bg-slate-800/50 dark:border-slate-700">
+          <div className="p-4 border-b bg-slate-50/50 shrink-0 dark:bg-neutral-950/50 dark:border-neutral-800">
             <div className="flex items-center gap-2 mb-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filtros</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-neutral-300">Filtros</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               <Select
@@ -148,15 +148,15 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
             </div>
           ) : logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="p-4 rounded-full bg-slate-100 mb-4 dark:bg-slate-700">
+              <div className="p-4 rounded-full bg-slate-100 mb-4 dark:bg-neutral-900">
                 <FileText className="h-8 w-8 text-slate-400" />
               </div>
-              <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">Nenhum registro encontrado</h3>
+              <h3 className="text-lg font-medium text-slate-700 dark:text-neutral-300">Nenhum registro encontrado</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {isAdmin ? 'Nenhuma atividade registrada ainda' : 'Você ainda não realizou nenhuma ação'}
               </p>
               <p className="text-xs text-muted-foreground mt-4 max-w-sm">
-                💡 Certifique-se de que a tabela <code className="bg-slate-100 px-1 rounded dark:bg-slate-700">activity_logs</code> foi criada no Supabase
+                💡 Certifique-se de que a tabela <code className="bg-slate-100 px-1 rounded dark:bg-neutral-900">activity_logs</code> foi criada no Supabase
               </p>
             </div>
           ) : (
@@ -178,7 +178,7 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
                         </div>
                         
                         {log.entity_description && (
-                          <p className="text-sm text-slate-700 dark:text-slate-300 mt-2 line-clamp-2">
+                          <p className="text-sm text-slate-700 dark:text-neutral-300 mt-2 line-clamp-2">
                             {log.entity_description}
                           </p>
                         )}
@@ -206,7 +206,7 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t bg-slate-50 rounded-b-2xl shrink-0 dark:bg-slate-800/50 dark:border-slate-700">
+        <div className="p-4 border-t bg-slate-50 rounded-b-2xl shrink-0 dark:bg-neutral-950/50 dark:border-neutral-800">
           <p className="text-xs text-center text-muted-foreground">
             Mostrando {logs.length} registro{logs.length !== 1 ? 's' : ''}
           </p>

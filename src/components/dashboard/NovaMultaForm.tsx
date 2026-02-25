@@ -180,7 +180,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
       onClick={handleBackdropClick}
     >
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border-0 animate-in zoom-in-95 slide-in-from-bottom-4 my-auto">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 sticky top-0 bg-white/95 backdrop-blur-sm dark:bg-slate-800/95 z-10">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 sticky top-0 bg-white/95 backdrop-blur-sm dark:bg-neutral-950/95 z-10">
           <CardTitle className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50">
               <Plus className="h-5 w-5 text-blue-600" />
@@ -247,7 +247,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Responsabilidade *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Responsabilidade *</label>
                 <Select
                   name="Resposabilidade"
                   value={formData.Resposabilidade}
@@ -256,7 +256,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">
                   Motorista {formData.Resposabilidade === 'Motorista' ? '*' : '(opcional)'}
                 </label>
                 <Input
@@ -271,7 +271,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Auto de Infração *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Auto de Infração *</label>
                 <Input
                   name="Auto_Infracao"
                   value={formData.Auto_Infracao}
@@ -281,7 +281,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Código da Infração</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Código da Infração</label>
                 <Input
                   name="Codigo_Infracao"
                   value={formData.Codigo_Infracao}
@@ -294,7 +294,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Veículo (Placa) *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Veículo (Placa) *</label>
                 <Input
                   name="Veiculo"
                   value={formData.Veiculo}
@@ -307,7 +307,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Data *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Data *</label>
                 <Input
                   name="Data_Cometimento"
                   value={formData.Data_Cometimento}
@@ -317,7 +317,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Hora</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Hora</label>
                 <Input
                   name="Hora_Cometimento"
                   value={formData.Hora_Cometimento}
@@ -326,7 +326,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Estado *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Estado *</label>
                 <Select
                   name="Estado"
                   value={formData.Estado}
@@ -337,20 +337,20 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Descrição da Infração *</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Descrição da Infração *</label>
               <textarea
                 name="Descricao"
                 value={formData.Descricao}
                 onChange={handleChange}
                 placeholder="Descrição completa da infração"
-                className="flex min-h-[100px] w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 text-sm ring-offset-background placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 focus-visible:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
+                className="flex min-h-[100px] w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100 text-sm ring-offset-background placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 focus-visible:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Valor da Multa *</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Valor da Multa *</label>
                 <Input
                   name="Valor"
                   value={formData.Valor}
@@ -360,7 +360,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Valor do Boleto</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Valor do Boleto</label>
                 <Input
                   name="Valor_Boleto"
                   value={formData.Valor_Boleto}
@@ -372,7 +372,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Status Boleto</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Status Boleto</label>
                 <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
                   statusBoletoCalculado === 'Pago' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
                   statusBoletoCalculado === 'Vencido' ? 'bg-red-50 text-red-600 border-red-200' :
@@ -384,7 +384,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 <span className="text-xs text-slate-500">Calculado automaticamente</span>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Vencimento Boleto</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Vencimento Boleto</label>
                 <Input
                   name="Expiracao_Boleto"
                   value={formData.Expiracao_Boleto}
@@ -398,7 +398,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
             {formData.Resposabilidade === 'Motorista' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Prazo p/ Indicação (SENATRAN)</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Prazo p/ Indicação (SENATRAN)</label>
                   <Input
                     name="Expiracao_Indicacao"
                     value={formData.Expiracao_Indicacao}
@@ -408,7 +408,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                   <span className="text-xs text-slate-500">Data limite para indicar o real infrator</span>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Status Indicação</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Status Indicação</label>
                   <div className={`flex h-11 w-full items-center rounded-xl border-2 px-4 py-2 text-sm font-semibold ${
                     statusIndicacaoCalculado === 'Indicado' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                     statusIndicacaoCalculado === 'Indicar Expirado' ? 'bg-red-50 text-red-600 border-red-200' :
@@ -424,7 +424,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Link do Boleto</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Link do Boleto</label>
                 <Input
                   name="Boleto"
                   value={formData.Boleto}
@@ -434,7 +434,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Link de Consulta</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Link de Consulta</label>
                 <Input
                   name="Consulta"
                   value={formData.Consulta}
@@ -446,7 +446,7 @@ export function NovaMultaForm({ onClose, onSuccess }: NovaMultaFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Notas</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-neutral-300">Notas</label>
               <Input
                 name="Notas"
                 value={formData.Notas}

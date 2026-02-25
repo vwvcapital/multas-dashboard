@@ -55,7 +55,7 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
       onClick={handleBackdropClick}
     >
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border-0 animate-in zoom-in-95 slide-in-from-bottom-4 my-auto">
-        <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2 sticky top-0 bg-white/95 backdrop-blur-sm dark:bg-slate-800/95 z-10">
+        <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2 sticky top-0 bg-white/95 backdrop-blur-sm dark:bg-neutral-950/95 z-10">
           <div className="flex-1">
             <CardTitle className="flex items-center gap-3 text-xl">
               <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40">
@@ -64,7 +64,7 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
               Detalhes da Multa
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2 ml-[52px]">
-              Auto de Infração: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{multa.Auto_Infracao}</span>
+              Auto de Infração: <span className="font-mono font-medium text-slate-700 dark:text-neutral-300">{multa.Auto_Infracao}</span>
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl">
@@ -96,18 +96,18 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
                 <Truck className="h-5 w-5" />
                 <span className="font-semibold">Veículo</span>
               </div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{multa.Veiculo || '-'}</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100">{multa.Veiculo || '-'}</p>
               <div className="flex items-center gap-2 mt-3">
                 <MapPin className="h-4 w-4 text-slate-400" />
                 <span className="text-sm text-slate-600">{multa.Estado || '-'}</span>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-5 border border-slate-200 dark:from-slate-700/50 dark:to-slate-700/30 dark:border-slate-600">
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-5 border border-slate-200 dark:from-neutral-900/50 dark:to-neutral-900/30 dark:border-neutral-700">
               <div className="flex items-center gap-2 text-slate-600 mb-3">
                 <User className="h-5 w-5" />
                 <span className="font-semibold">Motorista</span>
               </div>
-              <p className="text-lg font-medium text-slate-900 dark:text-slate-100">{multa.Motorista || '-'}</p>
+              <p className="text-lg font-medium text-slate-900 dark:text-neutral-100">{multa.Motorista || '-'}</p>
               <div className="flex items-center gap-2 mt-3">
                 <Building className="h-4 w-4 text-slate-400" />
                 <span className="text-sm text-slate-600">
@@ -119,31 +119,31 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
 
           {/* Data e Hora */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-slate-700">
+            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-neutral-900/50 dark:border-neutral-700">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-neutral-900">
                 <Calendar className="h-5 w-5 text-slate-500" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-medium">Data</p>
-                <p className="font-semibold text-slate-800 dark:text-slate-200">{multa.Data_Cometimento || '-'}</p>
+                <p className="font-semibold text-slate-800 dark:text-neutral-200">{multa.Data_Cometimento || '-'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-slate-700">
+            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-neutral-900/50 dark:border-neutral-700">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-neutral-900">
                 <Clock className="h-5 w-5 text-slate-500" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-medium">Hora</p>
-                <p className="font-semibold text-slate-800 dark:text-slate-200">{multa.Hora_Cometimento || '-'}</p>
+                <p className="font-semibold text-slate-800 dark:text-neutral-200">{multa.Hora_Cometimento || '-'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-slate-700">
+            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-neutral-900/50 dark:border-neutral-700">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white shadow-sm dark:bg-neutral-900">
                 <Receipt className="h-5 w-5 text-slate-500" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-medium">Vencimento</p>
-                <p className="font-semibold text-slate-800 dark:text-slate-200">{multa.Expiracao_Boleto || '-'}</p>
+                <p className="font-semibold text-slate-800 dark:text-neutral-200">{multa.Expiracao_Boleto || '-'}</p>
               </div>
             </div>
           </div>
@@ -220,9 +220,9 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
 
           {/* Notas */}
           {multa.Notas && (
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 dark:bg-slate-700/50 dark:border-slate-600">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 dark:bg-neutral-900/50 dark:border-neutral-700">
               <p className="text-sm font-semibold text-slate-600 mb-2">Notas</p>
-              <p className="text-sm text-slate-700 dark:text-slate-300">{multa.Notas}</p>
+              <p className="text-sm text-slate-700 dark:text-neutral-300">{multa.Notas}</p>
             </div>
           )}
 
@@ -252,7 +252,7 @@ export function MultaDetailsModal({ multa, onClose }: MultaDetailsModalProps) {
                 href={multa.Consulta} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors font-medium text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-300"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors font-medium text-slate-700 dark:bg-neutral-950 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:text-neutral-300"
               >
                 <ExternalLink className="h-4 w-4" />
                 Consultar Infração

@@ -27,15 +27,15 @@ const KANBAN_COLUMNS = [
     id: 'Vencido',
     label: 'Vencido',
     color: 'bg-red-500',
-    lightBg: 'bg-red-50',
-    borderColor: 'border-red-200',
-    textColor: 'text-red-700',
+    lightBg: 'bg-red-50 dark:bg-red-950/15',
+    borderColor: 'border-red-200 dark:border-red-900',
+    textColor: 'text-red-700 dark:text-red-400',
     badgeVariant: 'destructive' as const,
     gradient: 'bg-gradient-to-r from-red-400 to-rose-500',
-    cardBg: 'bg-red-50/40',
-    cardBorder: 'border-red-100',
-    iconBg: 'bg-red-50',
-    iconText: 'text-red-600',
+    cardBg: 'bg-red-50/40 dark:bg-red-950/20',
+    cardBorder: 'border-red-100 dark:border-red-900/50',
+    iconBg: 'bg-red-50 dark:bg-red-950/30',
+    iconText: 'text-red-600 dark:text-red-400',
     buttonBg: 'bg-red-500',
     buttonHover: 'hover:bg-red-600',
   },
@@ -43,15 +43,15 @@ const KANBAN_COLUMNS = [
     id: 'Pendente',
     label: 'Pendente',
     color: 'bg-amber-500',
-    lightBg: 'bg-amber-50',
-    borderColor: 'border-amber-200',
-    textColor: 'text-amber-700',
+    lightBg: 'bg-amber-50 dark:bg-amber-950/15',
+    borderColor: 'border-amber-200 dark:border-amber-900',
+    textColor: 'text-amber-700 dark:text-amber-400',
     badgeVariant: 'warning' as const,
     gradient: 'bg-gradient-to-r from-amber-400 to-orange-400',
-    cardBg: 'bg-amber-50/40',
-    cardBorder: 'border-amber-100',
-    iconBg: 'bg-amber-50',
-    iconText: 'text-amber-600',
+    cardBg: 'bg-amber-50/40 dark:bg-amber-950/20',
+    cardBorder: 'border-amber-100 dark:border-amber-900/50',
+    iconBg: 'bg-amber-50 dark:bg-amber-950/30',
+    iconText: 'text-amber-600 dark:text-amber-400',
     buttonBg: 'bg-amber-500',
     buttonHover: 'hover:bg-amber-600',
   },
@@ -59,15 +59,15 @@ const KANBAN_COLUMNS = [
     id: 'Disponível',
     label: 'Disponível',
     color: 'bg-blue-500',
-    lightBg: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    textColor: 'text-blue-700',
+    lightBg: 'bg-blue-50 dark:bg-blue-950/15',
+    borderColor: 'border-blue-200 dark:border-blue-900',
+    textColor: 'text-blue-700 dark:text-blue-400',
     badgeVariant: 'default' as const,
     gradient: 'bg-gradient-to-r from-blue-400 to-indigo-400',
-    cardBg: 'bg-blue-50/40',
-    cardBorder: 'border-blue-100',
-    iconBg: 'bg-blue-50',
-    iconText: 'text-blue-600',
+    cardBg: 'bg-blue-50/40 dark:bg-blue-950/20',
+    cardBorder: 'border-blue-100 dark:border-blue-900/50',
+    iconBg: 'bg-blue-50 dark:bg-blue-950/30',
+    iconText: 'text-blue-600 dark:text-blue-400',
     buttonBg: 'bg-blue-500',
     buttonHover: 'hover:bg-blue-600',
   },
@@ -75,15 +75,15 @@ const KANBAN_COLUMNS = [
     id: 'Concluído',
     label: 'Concluído',
     color: 'bg-slate-500',
-    lightBg: 'bg-slate-50',
-    borderColor: 'border-slate-200',
-    textColor: 'text-slate-700',
+    lightBg: 'bg-slate-50 dark:bg-neutral-950/30',
+    borderColor: 'border-slate-200 dark:border-neutral-800',
+    textColor: 'text-slate-700 dark:text-neutral-400',
     badgeVariant: 'secondary' as const,
     gradient: 'bg-gradient-to-r from-slate-400 to-slate-500',
-    cardBg: 'bg-slate-50/40',
-    cardBorder: 'border-slate-100',
-    iconBg: 'bg-slate-100',
-    iconText: 'text-slate-600',
+    cardBg: 'bg-slate-50/40 dark:bg-neutral-950/40',
+    cardBorder: 'border-slate-100 dark:border-neutral-800/60',
+    iconBg: 'bg-slate-100 dark:bg-neutral-900/50',
+    iconText: 'text-slate-600 dark:text-neutral-400',
     buttonBg: 'bg-slate-500',
     buttonHover: 'hover:bg-slate-600',
   },
@@ -120,22 +120,22 @@ function parseData(data?: string): number {
 
 // Cores predefinidas para tags
 const TAG_COLORS = [
-  { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200' },
-  { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
-  { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
-  { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-200' },
-  { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-200' },
-  { bg: 'bg-cyan-100', text: 'text-cyan-700', border: 'border-cyan-200' },
-  { bg: 'bg-violet-100', text: 'text-violet-700', border: 'border-violet-200' },
-  { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200' },
+  { bg: 'bg-blue-100 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-800' },
+  { bg: 'bg-emerald-100 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800' },
+  { bg: 'bg-purple-100 dark:bg-purple-950/40', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-800' },
+  { bg: 'bg-indigo-100 dark:bg-indigo-950/40', text: 'text-indigo-700 dark:text-indigo-300', border: 'border-indigo-200 dark:border-indigo-800' },
+  { bg: 'bg-teal-100 dark:bg-teal-950/40', text: 'text-teal-700 dark:text-teal-300', border: 'border-teal-200 dark:border-teal-800' },
+  { bg: 'bg-cyan-100 dark:bg-cyan-950/40', text: 'text-cyan-700 dark:text-cyan-300', border: 'border-cyan-200 dark:border-cyan-800' },
+  { bg: 'bg-violet-100 dark:bg-violet-950/40', text: 'text-violet-700 dark:text-violet-300', border: 'border-violet-200 dark:border-violet-800' },
+  { bg: 'bg-slate-100 dark:bg-neutral-900/50', text: 'text-slate-700 dark:text-neutral-300', border: 'border-slate-200 dark:border-neutral-700' },
 ]
 
 const TAG_COLOR_OVERRIDES: Record<string, { bg: string; text: string; border: string }> = {
-  pago: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
-  parcelado: { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-200' },
-  indicado: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200' },
-  'joao paulo': { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
-  rh: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
+  pago: { bg: 'bg-emerald-100 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800' },
+  parcelado: { bg: 'bg-yellow-100 dark:bg-yellow-950/40', text: 'text-yellow-700 dark:text-yellow-300', border: 'border-yellow-200 dark:border-yellow-800' },
+  indicado: { bg: 'bg-blue-100 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-800' },
+  'joao paulo': { bg: 'bg-emerald-100 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800' },
+  rh: { bg: 'bg-purple-100 dark:bg-purple-950/40', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-800' },
 }
 
 function getTagColor(tag: string) {
@@ -188,7 +188,7 @@ function TagInput({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose: (
           if (e.key === 'Escape') onClose()
         }}
         placeholder="Nova tag..."
-        className="h-6 px-2 text-[11px] border border-slate-200 rounded-md bg-white focus:outline-none dark:bg-slate-700 dark:border-slate-500 dark:text-slate-200 focus:ring-1 focus:ring-primary/40 w-24"
+        className="h-6 px-2 text-[11px] border border-slate-200 rounded-md bg-white focus:outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 focus:ring-1 focus:ring-primary/40 w-24"
       />
       <button
         onClick={handleSubmit}
@@ -198,7 +198,7 @@ function TagInput({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose: (
       </button>
       <button
         onClick={onClose}
-        className="h-6 w-6 flex items-center justify-center rounded-md bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+        className="h-6 w-6 flex items-center justify-center rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
       >
         <X className="h-3 w-3" />
       </button>
@@ -271,7 +271,7 @@ function KanbanCard({
         onDragStart={(e) => onDragStart(e, multa)}
         onDragEnd={onDragEnd}
         className={`group ${columnColors.cardBg} rounded-xl border-2 ${columnColors.cardBorder} cursor-grab active:cursor-grabbing h-[390px] flex flex-col
-          transition-all duration-200 hover:shadow-md hover:border-slate-200 overflow-hidden
+          transition-all duration-200 hover:shadow-md hover:border-slate-200 dark:hover:border-neutral-700 overflow-hidden
           ${isDragging ? 'opacity-40 scale-95 rotate-1 shadow-2xl' : 'opacity-100'}`}
       >
       {/* Top color bar */}
@@ -283,7 +283,7 @@ function KanbanCard({
           <div className={`flex items-center justify-center w-6 h-6 rounded-lg ${columnColors.iconBg} shrink-0`}>
             <Truck className={`h-3.5 w-3.5 ${columnColors.iconText}`} />
           </div>
-          <span className="font-extrabold text-base text-slate-900 dark:text-slate-100 tracking-tight truncate">{multa.Veiculo}</span>
+          <span className="font-extrabold text-base text-slate-900 dark:text-neutral-100 tracking-tight truncate">{multa.Veiculo}</span>
         </div>
 
         {/* Auto de Infração */}
@@ -295,17 +295,17 @@ function KanbanCard({
         {/* Motorista */}
         <div className="flex items-center gap-1.5 mb-2 text-xs">
           <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-          <span className="text-slate-700 dark:text-slate-300 font-medium truncate">{multa.Motorista}</span>
+          <span className="text-slate-700 dark:text-neutral-300 font-medium truncate">{multa.Motorista}</span>
         </div>
 
         {/* Responsabilidade */}
         <div className="mb-2">
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
             (multa.Resposabilidade || '').toLowerCase() === 'motorista'
-              ? 'bg-blue-100 text-blue-700 border-blue-200'
+              ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800'
               : (multa.Resposabilidade || '').toLowerCase() === 'empresa'
-                ? 'bg-purple-100 text-purple-700 border-purple-200'
-                : 'bg-slate-100 text-slate-700 border-slate-200'
+                ? 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
+                : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-neutral-900/50 dark:text-neutral-300 dark:border-neutral-700'
           }`}>
             {(multa.Resposabilidade || 'Sem responsabilidade').toUpperCase()}
           </span>
@@ -313,22 +313,22 @@ function KanbanCard({
 
         {/* Data + Valor */}
         <div className="flex items-center gap-4 mb-3 text-xs">
-          <span className="flex items-center gap-1.5 text-slate-500">
+          <span className="flex items-center gap-1.5 text-slate-500 dark:text-neutral-400">
             <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
             {multa.Data_Cometimento}
           </span>
-          <span className="flex items-center gap-1.5 text-emerald-700 font-semibold ml-auto">
+          <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold ml-auto">
             <DollarSign className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
             {multa.Valor_Boleto || multa.Valor}
           </span>
         </div>
 
         {/* Notas (destaque grande) */}
-        <div className="mb-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+        <div className="mb-3 p-2.5 rounded-lg bg-slate-50 dark:bg-neutral-950/60 border border-slate-200 dark:border-neutral-800">
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5">
               <StickyNote className="h-3 w-3 text-slate-500" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">Nota</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-neutral-400">Nota</span>
             </div>
             {onQuickEditNote && !isEditingNote && (
               <button
@@ -336,7 +336,7 @@ function KanbanCard({
                   e.stopPropagation()
                   setIsEditingNote(true)
                 }}
-                className="h-6 w-6 rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors inline-flex items-center justify-center"
+                className="h-6 w-6 rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors inline-flex items-center justify-center"
                 title="Editar nota"
               >
                 <Pencil className="h-3 w-3" />
@@ -345,12 +345,12 @@ function KanbanCard({
           </div>
 
           {nota ? (
-            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-3">{nota}</p>
+            <p className="text-xs text-slate-700 dark:text-neutral-300 leading-relaxed line-clamp-3">{nota}</p>
           ) : (
             <div className="space-y-1.5 py-0.5">
-              <div className="h-2 rounded bg-slate-200/80 w-[92%]" />
-              <div className="h-2 rounded bg-slate-200/80 w-[86%]" />
-              <div className="h-2 rounded bg-slate-200/80 w-[74%]" />
+              <div className="h-2 rounded bg-slate-200/80 dark:bg-neutral-800/60 w-[92%]" />
+              <div className="h-2 rounded bg-slate-200/80 dark:bg-neutral-800/60 w-[86%]" />
+              <div className="h-2 rounded bg-slate-200/80 dark:bg-neutral-800/60 w-[74%]" />
             </div>
           )}
         </div>
@@ -379,7 +379,7 @@ function KanbanCard({
             {!showTagInput && (
               <button
                 onClick={(e) => { e.stopPropagation(); setShowTagInput(true) }}
-                className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium border border-dashed border-slate-300 text-slate-400 hover:text-slate-600 hover:border-slate-400 hover:bg-slate-50 transition-all"
+                className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium border border-dashed border-slate-300 dark:border-neutral-700 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-300 hover:border-slate-400 dark:hover:border-neutral-700 hover:bg-slate-50 dark:hover:bg-neutral-800 transition-all"
                 title="Adicionar tag"
               >
                 <Plus className="h-2.5 w-2.5" />
@@ -430,26 +430,26 @@ function KanbanCard({
           }}
         >
           <div
-            className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-slate-800 dark:border-slate-600 sm:p-5"
+            className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-neutral-950 dark:border-neutral-700 sm:p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Editar nota da multa</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-neutral-100">Editar nota da multa</h3>
             <p className="text-xs text-slate-500 mt-1 truncate">{multa.Veiculo} • {multa.Auto_Infracao}</p>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-300 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 min-w-0">
                 <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{multa.Motorista || 'Sem motorista'}</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-300 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 min-w-0">
                 <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{multa.Data_Cometimento || 'Sem data'}</span>
               </div>
             </div>
 
-            <div className="mt-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <div className="flex items-center gap-1.5 mb-1.5 text-[11px] font-semibold text-slate-600">
-                <Tag className="h-3.5 w-3.5 text-slate-400" />
+            <div className="mt-2 p-2.5 rounded-lg bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-700">
+              <div className="flex items-center gap-1.5 mb-1.5 text-[11px] font-semibold text-slate-600 dark:text-neutral-400">
+                <Tag className="h-3.5 w-3.5 text-slate-400 dark:text-neutral-500" />
                 Tags
               </div>
               <div className="flex items-center flex-wrap gap-1">
@@ -476,7 +476,7 @@ function KanbanCard({
                 value={noteDraft}
                 onChange={(e) => setNoteDraft(e.target.value)}
                 rows={10}
-                className="w-full min-h-[300px] rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-700 dark:border-slate-500 dark:text-slate-200 resize-y focus:outline-none focus:ring-1 focus:ring-amber-300"
+                className="w-full min-h-[300px] rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 resize-y focus:outline-none focus:ring-1 focus:ring-amber-300"
                 placeholder="Digite uma nota..."
               />
               <div className="flex items-center justify-end gap-2">
@@ -485,7 +485,7 @@ function KanbanCard({
                     setNoteDraft(nota || '')
                     setIsEditingNote(false)
                   }}
-                  className="h-8 px-3 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                  className="h-8 px-3 rounded-md text-xs font-semibold bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
                   disabled={isSavingNote}
                 >
                   Cancelar
@@ -798,12 +798,12 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
 
       {/* Legend */}
       <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
-        <span className="font-medium text-slate-600">Arraste livre:</span>
+        <span className="font-medium text-slate-600 dark:text-neutral-400">Arraste livre:</span>
         {KANBAN_COLUMNS.filter(c => c.id !== 'Vencido').map((col, i, arr) => (
           <span key={col.id} className="flex items-center gap-1">
             <span className={`inline-block w-2 h-2 rounded-full ${col.color}`} />
             <span>{col.label}</span>
-            {i < arr.length - 1 && <span className="text-slate-300 mx-1">→</span>}
+            {i < arr.length - 1 && <span className="text-slate-300 dark:text-neutral-600 mx-1">→</span>}
           </span>
         ))}
       </div>
@@ -826,8 +826,8 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
                 ${isOver && dropAllowed
                   ? `${column.lightBg} ${column.borderColor} border-2 border-dashed shadow-lg scale-[1.01]`
                   : isOver && !dropAllowed
-                    ? 'bg-red-50 border-2 border-dashed border-red-200'
-                    : 'bg-slate-50/80 border-2 border-transparent'
+                    ? 'bg-red-50 dark:bg-red-950/15 border-2 border-dashed border-red-200 dark:border-red-900'
+                    : 'bg-slate-50/80 dark:bg-neutral-950/50 border-2 border-transparent'
                 }`}
               onDragEnter={(e) => handleDragEnter(e, column.id)}
               onDragLeave={() => handleDragLeave(column.id)}
@@ -835,11 +835,11 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
               onDrop={(e) => handleDrop(e, column.id)}
             >
               {/* Column Header — sticky on desktop page scroll */}
-              <div className="sticky top-16 z-30 p-3 pb-2 bg-white/95 backdrop-blur-sm border-b border-slate-200 rounded-t-2xl dark:bg-slate-800/95 dark:border-slate-600 shadow-sm">
+              <div className="sticky top-16 z-30 p-3 pb-2 bg-white/95 backdrop-blur-sm border-b border-slate-200 rounded-t-2xl dark:bg-neutral-950/95 dark:border-neutral-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-3 h-3 rounded-full ${column.color}`} />
                   <h3 className={`font-bold text-sm ${column.textColor}`}>{column.label}</h3>
-                  <span className="ml-auto text-xs font-semibold bg-white rounded-full px-2.5 py-0.5 text-slate-600 shadow-sm border dark:bg-slate-700 dark:text-slate-300 dark:border-slate-500">
+                  <span className="ml-auto text-xs font-semibold bg-white rounded-full px-2.5 py-0.5 text-slate-600 shadow-sm border dark:bg-neutral-900 dark:text-neutral-300 dark:border-neutral-700">
                     {columnMultas.length}
                   </span>
                 </div>
@@ -853,7 +853,7 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
                 <div className={`mx-3 mb-2 p-2 rounded-lg text-center text-[10px] font-medium transition-all duration-200
                   ${dropAllowed 
                     ? `${column.lightBg} ${column.textColor} border border-dashed ${column.borderColor}` 
-                    : 'bg-slate-100 text-slate-400 border border-dashed border-slate-200'}`}
+                    : 'bg-slate-100 dark:bg-neutral-900 text-slate-400 dark:text-neutral-500 border border-dashed border-slate-200 dark:border-neutral-700'}`}
                 >
                   {dropAllowed ? 'Solte aqui para mover' : 'Não permitido'}
                 </div>
@@ -863,10 +863,10 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
               <div className="flex-1 p-3 pt-1 space-y-2.5 min-h-[200px]">
                 {columnMultas.length === 0 && !draggingMulta && (
                   <div className="flex flex-col items-center justify-center h-32 text-center">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-2">
-                      <FileText className="h-5 w-5 text-slate-300" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-neutral-900 flex items-center justify-center mb-2">
+                      <FileText className="h-5 w-5 text-slate-300 dark:text-neutral-500" />
                     </div>
-                    <p className="text-xs text-slate-400">Nenhuma multa</p>
+                    <p className="text-xs text-slate-400 dark:text-neutral-500">Nenhuma multa</p>
                   </div>
                 )}
                 {visibleMultas.map((multa) => (
@@ -916,29 +916,29 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
 
       {pendingStatusChange && (
         <div className="fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-[1px] flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-slate-800 dark:border-slate-600 sm:p-5">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Confirmar mudança de status</h3>
-            <p className="text-sm text-slate-600 mt-1">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-4 dark:bg-neutral-950 dark:border-neutral-700 sm:p-5">
+            <h3 className="text-base font-bold text-slate-900 dark:text-neutral-100">Confirmar mudança de status</h3>
+            <p className="text-sm text-slate-600 dark:text-neutral-400 mt-1">
               Confira os dados abaixo antes de mover a multa.
             </p>
 
-            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-              <div className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{pendingStatusChange.multa.Veiculo}</div>
-              <div className="text-xs text-slate-600 font-mono truncate">{pendingStatusChange.multa.Auto_Infracao}</div>
-              <div className="text-xs text-slate-600 truncate">{pendingStatusChange.multa.Motorista}</div>
-              <div className="text-xs font-semibold text-emerald-700">{pendingStatusChange.multa.Valor_Boleto || pendingStatusChange.multa.Valor}</div>
+            <div className="mt-4 rounded-xl border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-900/50 p-3 space-y-2">
+              <div className="text-sm font-semibold text-slate-800 dark:text-neutral-200 truncate">{pendingStatusChange.multa.Veiculo}</div>
+              <div className="text-xs text-slate-600 dark:text-neutral-400 font-mono truncate">{pendingStatusChange.multa.Auto_Infracao}</div>
+              <div className="text-xs text-slate-600 dark:text-neutral-400 truncate">{pendingStatusChange.multa.Motorista}</div>
+              <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">{pendingStatusChange.multa.Valor_Boleto || pendingStatusChange.multa.Valor}</div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-slate-200 p-3 bg-white dark:bg-slate-700 dark:border-slate-600">
+            <div className="mt-4 rounded-xl border border-slate-200 dark:border-neutral-700 p-3 bg-white dark:bg-neutral-900 dark:border-neutral-700">
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className={`w-2.5 h-2.5 rounded-full ${getColumnById(pendingStatusChange.multa.Status_Boleto)?.color || 'bg-slate-400'}`} />
-                  <span className="font-medium text-slate-700 dark:text-slate-300 truncate">{pendingStatusChange.multa.Status_Boleto}</span>
+                  <span className="font-medium text-slate-700 dark:text-neutral-300 truncate">{pendingStatusChange.multa.Status_Boleto}</span>
                 </div>
                 <span className="text-slate-400">→</span>
                 <div className="flex items-center gap-2 min-w-0">
                   <div className={`w-2.5 h-2.5 rounded-full ${getColumnById(pendingStatusChange.targetStatus)?.color || 'bg-slate-400'}`} />
-                  <span className="font-bold text-slate-900 truncate">{pendingStatusChange.targetStatus}</span>
+                  <span className="font-bold text-slate-900 dark:text-neutral-100 truncate">{pendingStatusChange.targetStatus}</span>
                 </div>
               </div>
             </div>

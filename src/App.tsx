@@ -476,7 +476,7 @@ function App() {
   // Loading de autenticação
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center dark:from-black dark:via-black dark:to-black">
         <div className="text-center">
           <div className="relative">
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-xl shadow-primary/30 mx-auto">
@@ -495,7 +495,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 overflow-x-hidden dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 overflow-x-hidden dark:from-black dark:via-black dark:to-black">
       <Header 
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} 
         isSidebarOpen={isSidebarOpen} 
@@ -584,7 +584,7 @@ function App() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-neutral-100 dark:to-neutral-300">
                     {viewTitles[currentView].title}
                   </h2>
                   <p className="text-muted-foreground mt-1">
@@ -778,15 +778,15 @@ function App() {
             {/* Card de Resumo - Todas as Multas */}
             {currentView === 'todas' && !loading && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50 dark:border-slate-700 dark:from-slate-800/50 dark:to-gray-800/50">
+                <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50 dark:border-neutral-800 dark:from-black/50 dark:to-neutral-950/50">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-700">
-                        <FileWarning className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-neutral-900">
+                        <FileWarning className="h-6 w-6 text-slate-600 dark:text-neutral-400" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">Total de Multas</p>
-                        <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">{filteredTotals.quantidade}</p>
+                        <p className="text-2xl font-bold text-slate-700 dark:text-neutral-200">{filteredTotals.quantidade}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -854,7 +854,7 @@ function App() {
                   )}
                   
                   {/* Sort Select */}
-                  <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2 dark:bg-slate-800 dark:border-slate-600">
+                  <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2 dark:bg-neutral-950 dark:border-neutral-700">
                     <ArrowUpDown className="h-4 w-4 text-slate-400" />
                     <Select
                       options={sortOptions}
@@ -865,17 +865,17 @@ function App() {
                   </div>
                   
                   {/* Toggle View Mode */}
-                  <div className="flex items-center bg-white border-2 border-slate-200 rounded-xl overflow-hidden dark:bg-slate-800 dark:border-slate-600">
+                  <div className="flex items-center bg-white border-2 border-slate-200 rounded-xl overflow-hidden dark:bg-neutral-950 dark:border-neutral-700">
                     <button
                       onClick={() => setDisplayMode('list')}
-                      className={`p-2.5 transition-all duration-200 ${displayMode === 'list' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                      className={`p-2.5 transition-all duration-200 ${displayMode === 'list' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-neutral-800'}`}
                       title="Visualizar em lista"
                     >
                       <List className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setDisplayMode('cards')}
-                      className={`p-2.5 transition-all duration-200 ${displayMode === 'cards' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                      className={`p-2.5 transition-all duration-200 ${displayMode === 'cards' ? 'bg-primary text-white shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-neutral-800'}`}
                       title="Visualizar em cards"
                     >
                       <LayoutGrid className="h-4 w-4" />
@@ -928,7 +928,7 @@ function App() {
                 </div>
               ) : (
                 <div>
-                    <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-200">
+                    <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-neutral-200">
                     {viewTitles[currentView].title} 
                     <span className="text-muted-foreground font-normal ml-2">({sortedFilteredMultas.length})</span>
                   </h3>

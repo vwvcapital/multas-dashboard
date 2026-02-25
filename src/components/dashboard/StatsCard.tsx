@@ -54,7 +54,7 @@ export function StatsCard({
             <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
               {title}
             </p>
-            <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-1 text-slate-900 truncate dark:text-slate-100">
+            <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-1 text-slate-900 truncate dark:text-neutral-100">
               {value}
             </p>
             {description && (

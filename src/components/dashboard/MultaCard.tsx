@@ -139,7 +139,7 @@ function IndicacaoDropdown({ multa, onIndicar, onRecusarIndicacao, onDesfazerInd
       </Button>
       {open && createPortal(
         <div
-          className="fixed w-48 bg-white rounded-lg shadow-lg border dark:bg-slate-800 dark:border-slate-600 border-slate-200 py-1 z-[9999] animate-in fade-in-0 zoom-in-95"
+          className="fixed w-48 bg-white rounded-lg shadow-lg border dark:bg-neutral-950 dark:border-neutral-700 border-slate-200 py-1 z-[9999] animate-in fade-in-0 zoom-in-95"
           style={{ top: menuPos.top, left: menuPos.left }}
         >
           {actions.map((action, i) => (
@@ -242,7 +242,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
                 <Truck className="h-4 w-4 text-blue-600" />
               </div>
-              <span className="font-bold text-lg text-slate-900 dark:text-slate-100 truncate">{multa.Veiculo}</span>
+              <span className="font-bold text-lg text-slate-900 dark:text-neutral-100 truncate">{multa.Veiculo}</span>
               <Badge variant="outline" className="shrink-0 text-[10px] px-2">{multa.Estado}</Badge>
             </div>
           </div>
@@ -300,7 +300,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
         <div className="flex items-center justify-between pt-4 border-t border-slate-100">
           <div>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Valor Multa</p>
-            <p className="font-semibold text-slate-700 dark:text-slate-300">{multa.Valor}</p>
+            <p className="font-semibold text-slate-700 dark:text-neutral-300">{multa.Valor}</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Valor Boleto</p>
@@ -480,8 +480,8 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
 
       {showStatusModal && createPortal(
         <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center p-4" onClick={() => !savingStatus && setShowStatusModal(false)}>
-          <div className="w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-xl dark:bg-slate-800 dark:border-slate-600 p-4" onClick={(e) => e.stopPropagation()}>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Definir status da multa</h4>
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-xl dark:bg-neutral-950 dark:border-neutral-700 p-4" onClick={(e) => e.stopPropagation()}>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-neutral-100 mb-1">Definir status da multa</h4>
             <p className="text-xs text-muted-foreground mb-3">{multa.Veiculo} • {multa.Auto_Infracao}</p>
             <Select
               options={statusOptions}
