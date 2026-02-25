@@ -25,9 +25,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   }, [])
 
   const roleLabels: Record<string, string> = {
-    admin: 'Administrador',
-    financeiro: 'Financeiro',
-    rh: 'RH'
+    admin: 'Administrador'
   }
 
   return (

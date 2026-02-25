@@ -343,7 +343,7 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
               </div>
             </div>
 
-            {(multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar' || multa.Status_Boleto === 'Pago') && (
+            {(multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Pago') && (
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Link do Comprovante de Pagamento</label>
                 <Input

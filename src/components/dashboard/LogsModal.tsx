@@ -61,8 +61,6 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
       admin: 'Admin',
-      financeiro: 'Financeiro',
-      rh: 'RH',
     }
     return labels[role] || role
   }
@@ -70,8 +68,6 @@ export function LogsModal({ isOpen, onClose, userId, userName, userRole }: LogsM
   const roleOptions = [
     { value: 'todos', label: 'Todas as Roles' },
     { value: 'admin', label: 'Admin' },
-    { value: 'financeiro', label: 'Financeiro' },
-    { value: 'rh', label: 'RH' },
   ]
 
   const userOptions = [

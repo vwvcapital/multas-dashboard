@@ -18,8 +18,13 @@ function parseData(data: string): Date | null {
 
 // Função para recalcular o status do boleto de cada multa
 function recalcularStatusBoleto(multa: Multa): Multa {
-  // Não recalcular se já está em status final (Concluído, Descontar, Pago)
-  if (['Concluído', 'Descontar', 'Pago'].includes(multa.Status_Boleto)) {
+  // Normaliza status legado 'Pago' para 'Concluído'
+  if (multa.Status_Boleto === 'Pago') {
+    return { ...multa, Status_Boleto: 'Concluído' }
+  }
+
+  // Respeita status já salvo no banco (inclusive alterações manuais/Kanban)
+  if (multa.Status_Boleto === 'Pendente' || multa.Status_Boleto === 'Disponível' || multa.Status_Boleto === 'Vencido' || multa.Status_Boleto === 'Concluído') {
     return multa
   }
   
@@ -53,17 +58,81 @@ interface UseMultasOptions {
 export function useMultas(options: UseMultasOptions = {}) {
   const { userRole } = options
   const [allMultas, setAllMultas] = useState<Multa[]>([])
+  const [tagsByMultaId, setTagsByMultaId] = useState<Record<number, string[]>>({})
+  const [editedAtByMultaId, setEditedAtByMultaId] = useState<Record<number, number>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchMultas = useCallback(async () => {
+  const fetchTags = useCallback(async () => {
     try {
-      setLoading(true)
+      const { data, error: supabaseError } = await supabase
+        .from('multa_tags')
+        .select('multa_id, tag, created_at')
+        .order('created_at', { ascending: true })
+
+      if (supabaseError) {
+        console.error('Erro ao carregar tags:', supabaseError)
+        return
+      }
+
+      const grouped = ((data as { multa_id: number; tag: string }[]) || []).reduce((acc, row) => {
+        if (!acc[row.multa_id]) {
+          acc[row.multa_id] = []
+        }
+        acc[row.multa_id].push(row.tag)
+        return acc
+      }, {} as Record<number, string[]>)
+
+      setTagsByMultaId(grouped)
+    } catch (err) {
+      console.error('Erro ao carregar tags:', err)
+    }
+  }, [])
+
+  const fetchEditedAt = useCallback(async () => {
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('activity_logs')
+        .select('entity_id, action, created_at')
+        .eq('entity_type', 'multa')
+        .in('action', ['editar_multa', 'alterar_status_kanban', 'alterar_status_manual', 'add_tag', 'remove_tag'])
+        .order('created_at', { ascending: false })
+        .limit(5000)
+
+      if (supabaseError) {
+        if (supabaseError.code !== '42P01') {
+          console.error('Erro ao carregar histórico de edição:', supabaseError)
+        }
+        return
+      }
+
+      const grouped = ((data as { entity_id: number | null; created_at: string }[]) || []).reduce((acc, row) => {
+        if (!row.entity_id || acc[row.entity_id]) return acc
+        const timestamp = new Date(row.created_at).getTime()
+        if (!Number.isNaN(timestamp)) {
+          acc[row.entity_id] = timestamp
+        }
+        return acc
+      }, {} as Record<number, number>)
+
+      setEditedAtByMultaId(grouped)
+    } catch (err) {
+      console.error('Erro ao carregar histórico de edição:', err)
+    }
+  }, [])
+
+  const fetchMultas = useCallback(async (options?: { silent?: boolean }) => {
+    const isSilent = options?.silent ?? false
+    try {
+      if (!isSilent) {
+        setLoading(true)
+      }
       setError(null)
 
       const { data, error: supabaseError } = await supabase
         .from('Multas')
         .select('*')
+        .order('id', { ascending: false })
 
       if (supabaseError) {
         console.error('Supabase error:', supabaseError)
@@ -79,7 +148,9 @@ export function useMultas(options: UseMultasOptions = {}) {
       setError('Erro ao conectar com o banco de dados')
       setAllMultas([])
     } finally {
-      setLoading(false)
+      if (!isSilent) {
+        setLoading(false)
+      }
     }
   }, [])
 
@@ -87,12 +158,15 @@ export function useMultas(options: UseMultasOptions = {}) {
     fetchMultas()
   }, [fetchMultas])
 
-  // Filtrar multas baseado no role do usuário
-  // Financeiro não pode ver multas com Status_Boleto = 'Pendente'
+  useEffect(() => {
+    fetchTags()
+  }, [fetchTags])
+
+  useEffect(() => {
+    fetchEditedAt()
+  }, [fetchEditedAt])
+
   const multas = useMemo(() => {
-    if (userRole === 'financeiro') {
-      return allMultas.filter(m => m.Status_Boleto !== 'Pendente')
-    }
     return allMultas
   }, [allMultas, userRole])
 
@@ -112,7 +186,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     [multas]
   )
 
-  // Multas concluídas do motorista (para RH)
+  // Multas concluídas do motorista
   const multasConcluidasMotorista = useMemo(() => 
     multas.filter(m => 
       m.Status_Boleto === 'Concluído' && 
@@ -121,9 +195,9 @@ export function useMultas(options: UseMultasOptions = {}) {
     [multas]
   )
 
-  // Multas com status Descontar (para RH descontar do motorista)
+  // Multas com status Pago de responsabilidade do motorista
   const multasPagasMotorista = useMemo(() => 
-    multas.filter(m => m.Status_Boleto === 'Descontar'), 
+    multas.filter(m => m.Status_Boleto === 'Pago' && m.Resposabilidade?.toLowerCase() === 'motorista'), 
     [multas]
   )
 
@@ -219,8 +293,7 @@ export function useMultas(options: UseMultasOptions = {}) {
   }
 
   // Função para marcar multa como paga
-  // Se responsabilidade é da Empresa, marca automaticamente como Concluído
-  // Se responsabilidade é do Motorista, marca como Descontar (para RH processar)
+  // Com fluxo de admin único, empresa e motorista são concluídos diretamente
   const marcarComoPago = useCallback(async (multaId: number, comprovantePagamento?: string) => {
     try {
       // Buscar a multa para verificar responsabilidade
@@ -230,19 +303,14 @@ export function useMultas(options: UseMultasOptions = {}) {
         return false
       }
 
-      // Determinar novo status baseado na responsabilidade
-      // - Empresa: marca como Concluído direto
-      // - Motorista: marca como Descontar (RH precisa descontar)
-      // - Outros/vazio: marca como Pago (comportamento padrão)
-      let novoStatus = 'Pago'
+      // Status Pago foi descontinuado: sempre conclui
+      let novoStatus = 'Concluído'
       const responsabilidade = multa.Resposabilidade?.toLowerCase()?.trim()
       
       console.log('Marcando como pago:', { multaId, responsabilidade, campo: multa.Resposabilidade })
       
-      if (responsabilidade === 'empresa') {
+      if (responsabilidade === 'empresa' || responsabilidade === 'motorista') {
         novoStatus = 'Concluído'
-      } else if (responsabilidade === 'motorista') {
-        novoStatus = 'Descontar'
       }
       
       console.log('Novo status:', novoStatus)
@@ -269,7 +337,7 @@ export function useMultas(options: UseMultasOptions = {}) {
       }
 
       // Recarregar dados
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao marcar como pago:', err)
@@ -304,7 +372,7 @@ export function useMultas(options: UseMultasOptions = {}) {
       }
 
       // Recarregar dados
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao desmarcar pagamento:', err)
@@ -312,7 +380,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas, multas])
 
-  // Função para RH marcar multa como concluído (após descontar do motorista)
+  // Função para marcar multa como concluído
   const marcarComoConcluido = useCallback(async (multaId: number) => {
     try {
       const { error: supabaseError } = await supabase
@@ -326,7 +394,7 @@ export function useMultas(options: UseMultasOptions = {}) {
       }
 
       // Recarregar dados
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao marcar como concluído:', err)
@@ -334,7 +402,7 @@ export function useMultas(options: UseMultasOptions = {}) {
     }
   }, [fetchMultas])
 
-  // Função para RH desfazer conclusão (voltar para Descontar ou Disponível baseado na responsabilidade)
+  // Função para desfazer conclusão (voltar ao status calculado)
   const desfazerConclusao = useCallback(async (multaId: number) => {
     try {
       // Buscar a multa para verificar responsabilidade
@@ -344,24 +412,15 @@ export function useMultas(options: UseMultasOptions = {}) {
         return false
       }
 
-      // Determinar para qual status voltar baseado na responsabilidade
-      // - Empresa: volta para Disponível (pois foi de Disponível -> Concluído)
-      // - Motorista: volta para Descontar (pois foi de Descontar -> Concluído)
-      let novoStatus = 'Descontar'
-      const responsabilidade = multa.Resposabilidade?.toLowerCase()?.trim()
-      
-      if (responsabilidade === 'empresa') {
-        // Empresa: recalcular o status baseado nos dados do boleto
-        const { calcularStatusBoleto } = await import('@/lib/utils')
-        novoStatus = calcularStatusBoleto({
-          pago: false,
-          concluido: false,
-          linkBoleto: multa.Boleto || '',
-          dataVencimento: multa.Expiracao_Boleto || '',
-        })
-      }
+      const { calcularStatusBoleto } = await import('@/lib/utils')
+      const novoStatus = calcularStatusBoleto({
+        pago: false,
+        concluido: false,
+        linkBoleto: multa.Boleto || '',
+        dataVencimento: multa.Expiracao_Boleto || '',
+      })
 
-      console.log('Desfazendo conclusão:', { multaId, responsabilidade, novoStatus })
+      console.log('Desfazendo conclusão:', { multaId, novoStatus })
 
       const { error: supabaseError } = await supabase
         .from('Multas')
@@ -374,13 +433,116 @@ export function useMultas(options: UseMultasOptions = {}) {
       }
 
       // Recarregar dados
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao desfazer conclusão:', err)
       return false
     }
   }, [fetchMultas, multas])
+
+  // Função genérica para atualizar status do boleto (usada pelo Kanban)
+  const updateStatusBoleto = useCallback(async (multaId: number, novoStatus: string) => {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('Multas')
+        .update({ Status_Boleto: novoStatus })
+        .eq('id', multaId)
+
+      if (supabaseError) {
+        console.error('Erro ao atualizar status:', supabaseError)
+        return false
+      }
+
+      await fetchMultas({ silent: true })
+      setEditedAtByMultaId((prev) => ({ ...prev, [multaId]: Date.now() }))
+      return true
+    } catch (err) {
+      console.error('Erro ao atualizar status:', err)
+      return false
+    }
+  }, [fetchMultas])
+
+  // Atualização rápida da nota da multa (usado no Kanban)
+  const updateNotaMulta = useCallback(async (multaId: number, nota: string) => {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('Multas')
+        .update({ Notas: nota })
+        .eq('id', multaId)
+
+      if (supabaseError) {
+        console.error('Erro ao atualizar nota:', supabaseError)
+        return false
+      }
+
+      // Atualiza apenas a multa editada, preservando ordem atual da lista
+      setAllMultas((prev) => prev.map((multa) =>
+        multa.id === multaId ? { ...multa, Notas: nota } : multa
+      ))
+      setEditedAtByMultaId((prev) => ({ ...prev, [multaId]: Date.now() }))
+      return true
+    } catch (err) {
+      console.error('Erro ao atualizar nota:', err)
+      return false
+    }
+  }, [])
+
+  const addTag = useCallback(async (multaId: number, tag: string) => {
+    const normalizedTag = tag.trim()
+    if (!normalizedTag) return false
+
+    try {
+      const current = tagsByMultaId[multaId] || []
+      if (current.some((item) => item.toLowerCase() === normalizedTag.toLowerCase())) {
+        return true
+      }
+
+      const { error: supabaseError } = await supabase
+        .from('multa_tags')
+        .insert({ multa_id: multaId, tag: normalizedTag })
+
+      if (supabaseError) {
+        console.error('Erro ao adicionar tag:', supabaseError)
+        return false
+      }
+
+      setTagsByMultaId((prev) => ({
+        ...prev,
+        [multaId]: [...(prev[multaId] || []), normalizedTag],
+      }))
+      setEditedAtByMultaId((prev) => ({ ...prev, [multaId]: Date.now() }))
+      return true
+    } catch (err) {
+      console.error('Erro ao adicionar tag:', err)
+      return false
+    }
+  }, [tagsByMultaId])
+
+  const removeTag = useCallback(async (multaId: number, tag: string) => {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('multa_tags')
+        .delete()
+        .eq('multa_id', multaId)
+        .eq('tag', tag)
+
+      if (supabaseError) {
+        console.error('Erro ao remover tag:', supabaseError)
+        return false
+      }
+
+      setTagsByMultaId((prev) => ({
+        ...prev,
+        [multaId]: (prev[multaId] || []).filter((item) => item !== tag),
+      }))
+      setEditedAtByMultaId((prev) => ({ ...prev, [multaId]: Date.now() }))
+      return true
+    } catch (err) {
+      console.error('Erro ao remover tag:', err)
+      return false
+    }
+  }, [])
 
   // Função para marcar multa como indicada (real infrator indicado no SENATRAN)
   const indicarMotorista = useCallback(async (multaId: number) => {
@@ -395,7 +557,7 @@ export function useMultas(options: UseMultasOptions = {}) {
         return false
       }
 
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao indicar motorista:', err)
@@ -416,7 +578,7 @@ export function useMultas(options: UseMultasOptions = {}) {
         return false
       }
 
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao recusar indicação:', err)
@@ -451,7 +613,7 @@ export function useMultas(options: UseMultasOptions = {}) {
         return false
       }
 
-      await fetchMultas()
+      await fetchMultas({ silent: true })
       return true
     } catch (err) {
       console.error('Erro ao desfazer indicação:', err)
@@ -497,6 +659,8 @@ export function useMultas(options: UseMultasOptions = {}) {
     multasIndicacaoProximoVencimento,
     loading,
     error,
+    tagsByMultaId,
+    editedAtByMultaId,
     stats,
     multasPorMes,
     multasPorVeiculo,
@@ -505,6 +669,10 @@ export function useMultas(options: UseMultasOptions = {}) {
     marcarComoConcluido,
     desfazerConclusao,
     desmarcarPagamento,
+    updateStatusBoleto,
+    updateNotaMulta,
+    addTag,
+    removeTag,
     indicarMotorista,
     recusarIndicacao,
     desfazerIndicacao,

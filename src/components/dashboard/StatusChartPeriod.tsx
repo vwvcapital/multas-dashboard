@@ -29,7 +29,6 @@ const COLORS: Record<string, string> = {
   'Pendente': '#f59e0b',
   'Disponível': '#3b82f6',
   'Concluído': '#22c55e',
-  'Descontar': '#8b5cf6',
   'Vencido': '#ef4444',
   'Pago': '#10b981',
   'Outro': '#94a3b8'

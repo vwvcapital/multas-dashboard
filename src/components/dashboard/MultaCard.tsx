@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Select } from '@/components/ui/select'
 import type { Multa } from '@/lib/supabase'
 import type { Permissions } from '@/contexts/AuthContext'
 import { 
@@ -22,7 +23,8 @@ import {
   Receipt,
   UserPlus,
   UserX,
-  ChevronDown
+  ChevronDown,
+  ArrowUpDown
 } from 'lucide-react'
 
 // Componente unificado de Indicação - botão único com dropdown quando necessário
@@ -169,6 +171,7 @@ interface MultaCardProps {
   onIndicar?: (multa: Multa) => void
   onDesfazerIndicacao?: (multa: Multa) => void
   onRecusarIndicacao?: (multa: Multa) => void
+  onSetStatus?: (multa: Multa, novoStatus: string) => Promise<void> | void
   permissions?: Permissions
 }
 
@@ -176,7 +179,6 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Pendente': { label: 'Pendente', variant: 'warning' },
   'Disponível': { label: 'Disponível', variant: 'default' },
   'Pago': { label: 'Pago', variant: 'success' },
-  'Descontar': { label: 'À Descontar', variant: 'purple' },
   'Concluído': { label: 'Concluído', variant: 'secondary' },
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
@@ -188,9 +190,35 @@ const statusIndicacaoConfig: Record<string, { label: string; variant: 'warning' 
   'Recusado': { label: 'Recusado', variant: 'destructive' },
 }
 
-export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, permissions }: MultaCardProps) {
+export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, onSetStatus, permissions }: MultaCardProps) {
   const statusBoleto = statusBoletoConfig[multa.Status_Boleto] || { label: multa.Status_Boleto || '-', variant: 'secondary' as const }
-  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao || onRecusarIndicacao
+  const showActions = onViewDetails || onEdit || onDelete || onMarkAsPaid || onUnmarkAsPaid || onMarkAsComplete || onUndoComplete || onIndicar || onDesfazerIndicacao || onRecusarIndicacao || onSetStatus
+  const [showStatusModal, setShowStatusModal] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState(multa.Status_Boleto || 'Pendente')
+  const [savingStatus, setSavingStatus] = useState(false)
+
+  const statusOptions = [
+    { value: 'Pendente', label: 'Pendente' },
+    { value: 'Disponível', label: 'Disponível' },
+    { value: 'Concluído', label: 'Concluído' },
+    { value: 'Vencido', label: 'Vencido' },
+  ]
+
+  const handleOpenStatusModal = () => {
+    setSelectedStatus(multa.Status_Boleto || 'Pendente')
+    setShowStatusModal(true)
+  }
+
+  const handleConfirmStatus = async () => {
+    if (!onSetStatus) return
+    setSavingStatus(true)
+    try {
+      await onSetStatus(multa, selectedStatus)
+      setShowStatusModal(false)
+    } finally {
+      setSavingStatus(false)
+    }
+  }
   
   // Permissões com fallback para true (comportamento padrão)
   const canAccessBoleto = permissions?.canAccessBoleto ?? true
@@ -330,7 +358,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                 Consultar
               </span>
             ) : null}
-            {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar') ? (
+            {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Pago') ? (
               <a 
                 href={multa.Comprovante_Pagamento} 
                 target="_blank" 
@@ -357,13 +385,13 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Pagar</span>
                 </Button>
               )}
-              {onMarkAsComplete && multa.Status_Boleto === 'Descontar' && canMarkAsComplete && (
+              {onMarkAsComplete && multa.Status_Boleto === 'Pago' && canMarkAsComplete && (
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-8 px-3 gap-1.5 text-xs text-teal-600 border-teal-200 hover:bg-teal-50 hover:border-teal-300"
                   onClick={() => onMarkAsComplete(multa)}
-                  title="Marcar como Concluído (desconto aplicado)"
+                  title="Marcar como Concluído"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Concluir</span>
@@ -381,7 +409,7 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                   <span className="hidden sm:inline">Desfazer</span>
                 </Button>
               )}
-              {onUnmarkAsPaid && multa.Status_Boleto === 'Descontar' && canMarkAsPaid && (
+              {onUnmarkAsPaid && multa.Status_Boleto === 'Pago' && canMarkAsPaid && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -399,6 +427,18 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
                 onRecusarIndicacao={onRecusarIndicacao}
                 onDesfazerIndicacao={onDesfazerIndicacao}
               />
+              {onSetStatus && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300"
+                  onClick={handleOpenStatusModal}
+                  title="Definir Status"
+                >
+                  <ArrowUpDown className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Status</span>
+                </Button>
+              )}
               {onViewDetails && (
                 <Button
                   variant="default"
@@ -437,6 +477,38 @@ export function MultaCard({ multa, onViewDetails, onEdit, onDelete, onMarkAsPaid
           )}
         </div>
       </CardContent>
+
+      {showStatusModal && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center p-4" onClick={() => !savingStatus && setShowStatusModal(false)}>
+          <div className="w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-xl p-4" onClick={(e) => e.stopPropagation()}>
+            <h4 className="text-sm font-semibold text-slate-900 mb-1">Definir status da multa</h4>
+            <p className="text-xs text-muted-foreground mb-3">{multa.Veiculo} • {multa.Auto_Infracao}</p>
+            <Select
+              options={statusOptions}
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            />
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowStatusModal(false)}
+                disabled={savingStatus}
+              >
+                Cancelar
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleConfirmStatus}
+                disabled={savingStatus}
+              >
+                {savingStatus ? 'Salvando...' : 'Salvar status'}
+              </Button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </Card>
   )
 }
@@ -453,10 +525,11 @@ interface MultasCardsProps {
   onIndicar?: (multa: Multa) => void
   onDesfazerIndicacao?: (multa: Multa) => void
   onRecusarIndicacao?: (multa: Multa) => void
+  onSetStatus?: (multa: Multa, novoStatus: string) => Promise<void> | void
   permissions?: Permissions
 }
 
-export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, permissions }: MultasCardsProps) {
+export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsPaid, onUnmarkAsPaid, onMarkAsComplete, onUndoComplete, onIndicar, onDesfazerIndicacao, onRecusarIndicacao, onSetStatus, permissions }: MultasCardsProps) {
   if (multas.length === 0) {
     return (
       <div className="text-center py-16">
@@ -485,6 +558,7 @@ export function MultasCards({ multas, onViewDetails, onEdit, onDelete, onMarkAsP
           onIndicar={onIndicar}
           onDesfazerIndicacao={onDesfazerIndicacao}
           onRecusarIndicacao={onRecusarIndicacao}
+          onSetStatus={onSetStatus}
           permissions={permissions}
         />
       ))}

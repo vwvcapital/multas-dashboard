@@ -31,4 +31,5 @@ export type Multa = {
   Comprovante_Pagamento?: string
   Status_Indicacao?: string
   Expiracao_Indicacao?: string
+  Tags?: string
 }

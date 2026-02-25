@@ -27,7 +27,7 @@ interface MultaDetailsModalProps {
 const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | 'success' | 'default' | 'secondary' | 'destructive' | 'purple' }> = {
   'Pendente': { label: 'Pendente', variant: 'warning' },
   'Disponível': { label: 'Disponível', variant: 'default' },
-  'Descontar': { label: 'À Descontar', variant: 'purple' },
+  'Pago': { label: 'Pago', variant: 'success' },
   'Concluído': { label: 'Concluído', variant: 'success' },
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }

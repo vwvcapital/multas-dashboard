@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useMultas } from '@/hooks/useMultas'
 import { useLogs } from '@/hooks/useLogs'
 import { useAuth } from '@/contexts/AuthContext'
@@ -20,6 +20,7 @@ import { DeleteMultaDialog } from '@/components/dashboard/DeleteMultaDialog'
 import { PagarMultaDialog } from '@/components/dashboard/PagarMultaDialog'
 import { MultaDetailsModal } from '@/components/dashboard/MultaDetailsModal'
 import { LogsModal } from '@/components/dashboard/LogsModal'
+import { KanbanBoard } from '@/components/dashboard/KanbanBoard'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +45,8 @@ import {
 type DisplayMode = 'list' | 'cards'
 type SortOption = 'recente' | 'antiga' | 'valor-maior' | 'valor-menor' | 'vencimento' | 'veiculo' | 'motorista'
 
+const SIDEBAR_COLLAPSED_STORAGE_KEY = 'multas-dashboard.sidebar-collapsed'
+
 // Função para converter valor string "R$ 260,32" para número
 function parseValor(valor: string): number {
   if (!valor) return 0
@@ -58,8 +61,6 @@ function App() {
     multasPendentes, 
     multasDisponiveis,
     multasConcluidas,
-    multasConcluidasMotorista,
-    multasPagasMotorista,
     multasVencidas,
     multasProximoVencimento,
     // multasFaltandoIndicar,
@@ -69,11 +70,17 @@ function App() {
     multasIndicacaoProximoVencimento,
     loading, 
     error, 
+    tagsByMultaId,
+    editedAtByMultaId,
     stats,
     marcarComoPago,
     marcarComoConcluido,
     desfazerConclusao,
     desmarcarPagamento,
+    updateStatusBoleto,
+    updateNotaMulta,
+    addTag,
+    removeTag,
     indicarMotorista,
     recusarIndicacao,
     desfazerIndicacao,
@@ -99,7 +106,16 @@ function App() {
   const [indicacaoFilter, setIndicacaoFilter] = useState('todos')
   const [sortOption, setSortOption] = useState<SortOption>('recente')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) === 'true'
+  })
   const [showLogsModal, setShowLogsModal] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, String(isSidebarCollapsed))
+  }, [isSidebarCollapsed])
 
   // Funções wrapper para ações com logs
   const handleMarcarComoPago = (multa: Multa) => {
@@ -189,6 +205,74 @@ function App() {
     }
   }
 
+  const handleUpdateStatusBoleto = async (multaId: number, novoStatus: string) => {
+    const multa = multas.find(m => m.id === multaId)
+    const success = await updateStatusBoleto(multaId, novoStatus)
+    if (success && multa) {
+      await registrarLog({
+        action: 'alterar_status_kanban',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { statusAnterior: multa.Status_Boleto, novoStatus },
+      })
+    }
+    return success
+  }
+
+  const handleSetStatusManual = async (multa: Multa, novoStatus: string) => {
+    const success = await updateStatusBoleto(multa.id, novoStatus)
+    if (success) {
+      await registrarLog({
+        action: 'alterar_status_manual',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { statusAnterior: multa.Status_Boleto, novoStatus },
+      })
+    }
+  }
+
+  const handleQuickEditNota = async (multaId: number, nota: string) => {
+    const multa = multas.find(m => m.id === multaId)
+    const success = await updateNotaMulta(multaId, nota)
+    if (success && multa) {
+      await registrarLog({
+        action: 'editar_multa',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { campo: 'Notas', nota },
+      })
+    }
+    return success
+  }
+
+  const handleAddTagKanban = async (multaId: number, tag: string) => {
+    const multa = multas.find(m => m.id === multaId)
+    const success = await addTag(multaId, tag)
+    if (success && multa) {
+      await registrarLog({
+        action: 'add_tag',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { tag },
+      })
+    }
+    return success
+  }
+
+  const handleRemoveTagKanban = async (multaId: number, tag: string) => {
+    const multa = multas.find(m => m.id === multaId)
+    const success = await removeTag(multaId, tag)
+    if (success && multa) {
+      await registrarLog({
+        action: 'remove_tag',
+        entityId: multa.id,
+        entityDescription: `${multa.Veiculo} - ${multa.Auto_Infracao}`,
+        details: { tag },
+      })
+    }
+    return success
+  }
+
   // Handlers para criar/editar/excluir com log
   const handleNovaMultaSuccess = async (novaMulta?: { id?: number; Veiculo?: string; Auto_Infracao?: string }) => {
     await refetch()
@@ -233,13 +317,7 @@ function App() {
         return multasPendentes
       case 'disponiveis':
         return multasDisponiveis
-      case 'pagas-motorista':
-        return multasPagasMotorista
       case 'concluidas':
-        // Para RH, mostrar apenas concluídas do motorista
-        if (user?.role === 'rh') {
-          return multasConcluidasMotorista
-        }
         return multasConcluidas
       case 'vencidas':
         return multasVencidas
@@ -248,13 +326,6 @@ function App() {
       case 'indicacao-vencimento':
         return multasIndicacaoProximoVencimento
       case 'todas':
-        // Para RH, mostrar apenas multas a descontar e concluídas do motorista
-        if (user?.role === 'rh') {
-          return multas.filter(m => 
-            m.Status_Boleto === 'Descontar' ||
-            (m.Status_Boleto === 'Concluído' && m.Resposabilidade?.toLowerCase() === 'motorista')
-          )
-        }
         return multas
       default:
         return multas
@@ -327,7 +398,6 @@ function App() {
     { value: 'todos', label: 'Todos os Status' },
     { value: 'Pendente', label: 'Pendentes' },
     { value: 'Disponível', label: 'Disponíveis' },
-    { value: 'Descontar', label: 'À Descontar' },
     { value: 'Concluído', label: 'Concluídos' },
     { value: 'Vencido', label: 'Vencidos' },
   ]
@@ -365,6 +435,10 @@ function App() {
       title: 'Dashboard de Multas', 
       description: 'Gerencie e acompanhe as multas da sua frota de caminhões' 
     },
+    kanban: { 
+      title: 'Kanban de Multas', 
+      description: 'Arraste os cards para alterar o status das multas' 
+    },
     recentes: { 
       title: 'Multas Recentes', 
       description: 'Últimas multas cadastradas no sistema' 
@@ -376,10 +450,6 @@ function App() {
     disponiveis: { 
       title: 'Multas Disponíveis', 
       description: 'Multas com boleto disponível para pagamento' 
-    },
-    'pagas-motorista': { 
-      title: 'Descontar de Motorista', 
-      description: 'Multas pagas aguardando desconto na folha do motorista' 
     },
     concluidas: { 
       title: 'Multas Concluídas', 
@@ -493,19 +563,18 @@ function App() {
           userRole={user?.role}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          collapsed={isSidebarCollapsed}
+          onToggleCollapsed={() => setIsSidebarCollapsed(prev => !prev)}
           onOpenLogs={() => setShowLogsModal(true)}
           counts={{
             recentes: stats.recentes,
             pendentes: stats.pendentes,
             disponiveis: stats.disponiveis,
-            pagasMotorista: stats.pagosMotorista,
-            concluidas: user?.role === 'rh' ? stats.concluidosMotorista : stats.concluidos,
+            concluidas: stats.concluidos,
             vencidas: stats.vencidos,
             vencimento: stats.proximoVencimento,
             indicacaoVencimento: stats.indicacaoProximoVencimento,
-            todas: user?.role === 'rh' 
-              ? stats.pagosMotorista + stats.concluidosMotorista 
-              : stats.total
+            todas: stats.total
           }}
         />
         
@@ -633,6 +702,34 @@ function App() {
               </>
             )}
 
+            {/* Kanban View */}
+            {currentView === 'kanban' && (
+              loading ? (
+                <Card>
+                  <CardContent className="p-5">
+                    <Skeleton className="h-4 w-32 mb-4" />
+                    <div className="flex gap-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Skeleton key={i} className="h-[400px] w-full rounded-xl" />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <KanbanBoard
+                  multas={multas}
+                  tagsByMultaId={tagsByMultaId}
+                  editedAtByMultaId={editedAtByMultaId}
+                  onAddTag={handleAddTagKanban}
+                  onRemoveTag={handleRemoveTagKanban}
+                  onUpdateStatus={handleUpdateStatusBoleto}
+                  onQuickEditNote={handleQuickEditNota}
+                  onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
+                  permissions={permissions}
+                />
+              )
+            )}
+
             {/* Card de Resumo - Próximo ao Vencimento */}
             {currentView === 'vencimento' && !loading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -724,7 +821,7 @@ function App() {
             )}
 
             {/* Filters and Actions - Show for list views */}
-            {currentView !== 'dashboard' && (
+            {currentView !== 'dashboard' && currentView !== 'kanban' && (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -797,7 +894,7 @@ function App() {
             )}
 
             {/* Multas View - List or Cards */}
-            {currentView !== 'dashboard' && (
+            {currentView !== 'dashboard' && currentView !== 'kanban' && (
               loading ? (
                 <Card>
                   <CardContent className="p-5">
@@ -847,6 +944,7 @@ function App() {
                     onIndicar={permissions.canViewIndicacao ? handleIndicarMotorista : undefined}
                     onDesfazerIndicacao={permissions.canViewIndicacao ? handleDesfazerIndicacao : undefined}
                     onRecusarIndicacao={permissions.canViewIndicacao ? handleRecusarIndicacao : undefined}
+                    onSetStatus={handleSetStatusManual}
                     permissions={permissions}
                   />
                 </div>

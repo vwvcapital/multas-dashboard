@@ -25,6 +25,10 @@ type ActionType =
   | 'criar_multa'
   | 'editar_multa'
   | 'excluir_multa'
+  | 'alterar_status_kanban'
+  | 'alterar_status_manual'
+  | 'add_tag'
+  | 'remove_tag'
   | 'login'
   | 'logout'
 
@@ -166,6 +170,8 @@ export function formatAction(action: string): string {
     criar_multa: 'Criou Multa',
     editar_multa: 'Editou Multa',
     excluir_multa: 'Excluiu Multa',
+    add_tag: 'Adicionou Tag',
+    remove_tag: 'Removeu Tag',
     login: 'Fez Login',
     logout: 'Fez Logout',
   }

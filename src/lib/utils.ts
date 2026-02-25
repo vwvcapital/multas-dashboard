@@ -22,8 +22,8 @@ export function formatDate(date: string | Date): string {
 
 /**
  * Calcula automaticamente o Status_Boleto baseado nas regras:
- * - Concluído: quando finalizado (empresa paga ou RH descontou do motorista)
- * - Pago: quando marcado como pago (aguardando RH para motorista)
+ * - Concluído: quando finalizado
+ * - Pago: quando marcado como pago e ainda não concluído
  * - Vencido: quando passa da data de vencimento e não foi pago
  * - Disponível: quando o link do boleto foi informado
  * - Pendente: quando não tem link do boleto

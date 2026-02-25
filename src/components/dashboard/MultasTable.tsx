@@ -162,7 +162,6 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Pendente': { label: 'Pendente', variant: 'warning' },
   'Disponível': { label: 'Disponível', variant: 'default' },
   'Pago': { label: 'Pago', variant: 'success' },
-  'Descontar': { label: 'À Descontar', variant: 'purple' },
   'Concluído': { label: 'Concluído', variant: 'secondary' },
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
@@ -322,7 +321,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                             <ExternalLink className="h-4 w-4" />
                           </span>
                         ) : null}
-                        {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Descontar') ? (
+                        {multa.Comprovante_Pagamento && (multa.Status_Boleto === 'Concluído' || multa.Status_Boleto === 'Pago') ? (
                           <a 
                             href={multa.Comprovante_Pagamento} 
                             target="_blank" 
@@ -350,13 +349,13 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               <span className="hidden xl:inline">Pagar</span>
                             </Button>
                           )}
-                          {onMarkAsComplete && multa.Status_Boleto === 'Descontar' && canMarkAsComplete && (
+                          {onMarkAsComplete && multa.Status_Boleto === 'Pago' && canMarkAsComplete && (
                             <Button
                               variant="outline"
                               size="sm"
                               className="h-8 px-3 gap-1.5 text-teal-600 border-teal-200 hover:bg-teal-50 hover:border-teal-300"
                               onClick={() => onMarkAsComplete(multa)}
-                              title="Marcar como Concluído (desconto aplicado)"
+                              title="Marcar como Concluído"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                               <span className="hidden xl:inline">Concluir</span>
@@ -374,7 +373,7 @@ export function MultasTable({ multas, title = "Multas Recentes", onViewDetails, 
                               <span className="hidden xl:inline">Desfazer</span>
                             </Button>
                           )}
-                          {onUnmarkAsPaid && multa.Status_Boleto === 'Descontar' && permissions?.canMarkAsPaid && (
+                          {onUnmarkAsPaid && multa.Status_Boleto === 'Pago' && permissions?.canMarkAsPaid && (
                             <Button
                               variant="outline"
                               size="sm"

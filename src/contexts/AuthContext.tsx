@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { supabase } from '@/lib/supabase'
 
 // Tipos de usuário e permissões
-export type UserRole = 'admin' | 'financeiro' | 'rh'
+export type UserRole = 'admin'
 
 export interface User {
   id: number
@@ -23,41 +23,17 @@ export interface Permissions {
   canViewIndicacao: boolean
 }
 
-// Definição de permissões por role
-const rolePermissions: Record<UserRole, Permissions> = {
-  admin: {
-    canViewDetails: true,
-    canAccessBoleto: true,
-    canAccessConsulta: true,
-    canMarkAsPaid: true,
-    canMarkAsComplete: true,
-    canEdit: true,
-    canDelete: true,
-    canCreate: true,
-    canViewIndicacao: true,
-  },
-  financeiro: {
-    canViewDetails: true,
-    canAccessBoleto: true,
-    canAccessConsulta: true,
-    canMarkAsPaid: true,
-    canMarkAsComplete: false,
-    canEdit: false,
-    canDelete: false,
-    canCreate: false,
-    canViewIndicacao: false,
-  },
-  rh: {
-    canViewDetails: true,
-    canAccessBoleto: false,
-    canAccessConsulta: false,
-    canMarkAsPaid: false,
-    canMarkAsComplete: true,
-    canEdit: false,
-    canDelete: false,
-    canCreate: false,
-    canViewIndicacao: false,
-  },
+// Definição de permissões
+const adminPermissions: Permissions = {
+  canViewDetails: true,
+  canAccessBoleto: true,
+  canAccessConsulta: true,
+  canMarkAsPaid: true,
+  canMarkAsComplete: true,
+  canEdit: true,
+  canDelete: true,
+  canCreate: true,
+  canViewIndicacao: true,
 }
 
 interface AuthContextType {
@@ -108,11 +84,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return { success: false, error: 'Usuário ou senha incorretos' }
       }
 
+      if (data.role !== 'admin') {
+        return { success: false, error: 'Apenas usuários administradores possuem acesso' }
+      }
+
       const loggedUser: User = {
         id: data.id,
         nome: data.nome,
         usuario: data.usuario,
-        role: data.role as UserRole,
+        role: 'admin',
       }
 
       setUser(loggedUser)
@@ -132,7 +112,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('user')
   }, [])
 
-  const permissions = user ? rolePermissions[user.role] : rolePermissions.rh
+  const permissions = user ? adminPermissions : adminPermissions
   const isAuthenticated = !!user
 
   return (
