@@ -146,7 +146,7 @@ function statusColor(status: string): string {
     case 'Vencido': return '#ef4444'
     case 'Pendente': return '#f59e0b'
     case 'Disponível': return '#3b82f6'
-    case 'Concluído': return '#6b7280'
+    case 'Concluído': return '#10b981'
     default: return '#94a3b8'
   }
 }
@@ -570,7 +570,7 @@ export function MultaGraphView({ multas, onViewDetails, onEdit }: MultaGraphView
           <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500" />Vencido</span>
           <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" />Pendente</span>
           <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-500" />Disponível</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-500" />Concluído</span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />Concluído</span>
         </div>
       </div>
 
