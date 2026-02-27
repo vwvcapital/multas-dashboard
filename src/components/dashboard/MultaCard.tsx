@@ -179,7 +179,7 @@ const statusBoletoConfig: Record<string, { label: string; variant: 'warning' | '
   'Pendente': { label: 'Pendente', variant: 'warning' },
   'Disponível': { label: 'Disponível', variant: 'default' },
   'Pago': { label: 'Pago', variant: 'success' },
-  'Concluído': { label: 'Concluído', variant: 'secondary' },
+  'Concluído': { label: 'Concluído', variant: 'success' },
   'Vencido': { label: 'Vencido', variant: 'destructive' },
 }
 
