@@ -716,7 +716,16 @@ function App() {
                   </CardContent>
                 </Card>
               ) : (
-                <KanbanBoard
+                <>
+                  {permissions.canCreate && (
+                    <div className="flex justify-end mb-4">
+                      <Button onClick={() => setShowNovaMultaForm(true)} className="shrink-0">
+                        <Plus className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Nova Multa</span>
+                      </Button>
+                    </div>
+                  )}
+                  <KanbanBoard
                   multas={multas}
                   tagsByMultaId={tagsByMultaId}
                   editedAtByMultaId={editedAtByMultaId}
@@ -727,6 +736,7 @@ function App() {
                   onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
                   permissions={permissions}
                 />
+                </>
               )
             )}
 
