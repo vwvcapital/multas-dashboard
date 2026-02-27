@@ -216,6 +216,7 @@ function KanbanCard({
   onDragEnd,
   isDragging,
   onViewDetails,
+  onEdit,
   onAddTag,
   onRemoveTag,
   onQuickEditNote,
@@ -236,6 +237,7 @@ function KanbanCard({
   onDragEnd: () => void
   isDragging: boolean
   onViewDetails?: (multa: Multa) => void
+  onEdit?: (multa: Multa) => void
   onAddTag: (multaId: number, tag: string) => Promise<boolean>
   onRemoveTag: (multaId: number, tag: string) => Promise<boolean>
   onQuickEditNote?: (multaId: number, nota: string) => Promise<boolean>
@@ -400,21 +402,38 @@ function KanbanCard({
           )}
         </div>
 
-        {/* Footer — Botão detalhes proeminente */}
-        {onViewDetails && (
-          <div className="mt-auto">
-            <Button
-              variant="default"
-              size="sm"
-              className={`w-full h-8 text-xs gap-1.5 font-semibold text-white shadow-md ${columnColors.buttonBg} ${columnColors.buttonHover}`}
-              onClick={(e) => {
-                e.stopPropagation()
-                onViewDetails(multa)
-              }}
-            >
-              <Eye className="h-3.5 w-3.5" />
-              Ver Detalhes
-            </Button>
+        {/* Footer — Ações */}
+        {(onViewDetails || onEdit) && (
+          <div className="mt-auto flex items-center gap-2">
+            {onViewDetails && (
+              <Button
+                variant="default"
+                size="sm"
+                className={`flex-1 h-8 text-xs gap-1.5 font-semibold text-white shadow-md ${columnColors.buttonBg} ${columnColors.buttonHover}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onViewDetails(multa)
+                }}
+              >
+                <Eye className="h-3.5 w-3.5" />
+                Ver Detalhes
+              </Button>
+            )}
+
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-xs gap-1.5"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit(multa)
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -515,10 +534,11 @@ interface KanbanBoardProps {
   onUpdateStatus: (multaId: number, newStatus: string) => Promise<boolean>
   onQuickEditNote?: (multaId: number, nota: string) => Promise<boolean>
   onViewDetails?: (multa: Multa) => void
+  onEdit?: (multa: Multa) => void
   permissions?: Permissions
 }
 
-export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag, onRemoveTag, onUpdateStatus, onQuickEditNote, onViewDetails, permissions }: KanbanBoardProps) {
+export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag, onRemoveTag, onUpdateStatus, onQuickEditNote, onViewDetails, onEdit, permissions }: KanbanBoardProps) {
   const [draggingMulta, setDraggingMulta] = useState<Multa | null>(null)
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null)
   const [updatingId, setUpdatingId] = useState<number | null>(null)
@@ -891,6 +911,7 @@ export function KanbanBoard({ multas, tagsByMultaId, editedAtByMultaId, onAddTag
                       onDragEnd={handleDragEnd}
                       isDragging={draggingMulta?.id === multa.id}
                       onViewDetails={permissions?.canViewDetails ? onViewDetails : undefined}
+                      onEdit={permissions?.canEdit ? onEdit : undefined}
                       onAddTag={handleAddTag}
                       onRemoveTag={handleRemoveTag}
                       onQuickEditNote={handleQuickEditNote}

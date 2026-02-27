@@ -66,12 +66,16 @@ export function EditMultaForm({ multa, onClose, onSuccess }: EditMultaFormProps)
 
     try {
       const isMotorista = formData.Resposabilidade === 'Motorista'
+      const mudouResponsabilidade = (multa.Resposabilidade || 'Empresa') !== formData.Resposabilidade
+      const statusBoletoParaSalvar = mudouResponsabilidade
+        ? (multa.Status_Boleto || statusBoletoCalculado)
+        : statusBoletoCalculado
 
       const { error: supabaseError } = await supabase
         .from('Multas')
         .update({
           ...formData,
-          Status_Boleto: statusBoletoCalculado,
+          Status_Boleto: statusBoletoParaSalvar,
           Status_Indicacao: isMotorista ? statusIndicacaoCalculado : null,
           Expiracao_Indicacao: isMotorista ? formData.Expiracao_Indicacao : '',
           Codigo_Infracao: formData.Codigo_Infracao ? parseInt(formData.Codigo_Infracao) : null,

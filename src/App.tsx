@@ -734,6 +734,7 @@ function App() {
                   onUpdateStatus={handleUpdateStatusBoleto}
                   onQuickEditNote={handleQuickEditNota}
                   onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
+                    onEdit={permissions.canEdit ? setEditingMulta : undefined}
                   permissions={permissions}
                 />
                 </>
