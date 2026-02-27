@@ -21,6 +21,7 @@ import { PagarMultaDialog } from '@/components/dashboard/PagarMultaDialog'
 import { MultaDetailsModal } from '@/components/dashboard/MultaDetailsModal'
 import { LogsModal } from '@/components/dashboard/LogsModal'
 import { KanbanBoard } from '@/components/dashboard/KanbanBoard'
+import { MultaGraphView } from '@/components/dashboard/MultaGraphView'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
@@ -467,6 +468,10 @@ function App() {
       title: 'Próximo Expiração de Indicação', 
       description: 'Multas com indicação pendente, ordenadas por data de expiração' 
     },
+    grafo: {
+      title: 'Conexões entre Multas',
+      description: 'Visualize as relações entre multas agrupadas por motorista, veículo e mais'
+    },
     todas: { 
       title: 'Todas as Multas', 
       description: 'Lista completa de todas as multas registradas' 
@@ -741,6 +746,24 @@ function App() {
               )
             )}
 
+            {/* Graph View */}
+            {currentView === 'grafo' && (
+              loading ? (
+                <Card>
+                  <CardContent className="p-5">
+                    <Skeleton className="h-4 w-32 mb-4" />
+                    <Skeleton className="h-[400px] w-full rounded-xl" />
+                  </CardContent>
+                </Card>
+              ) : (
+                <MultaGraphView
+                  multas={multas}
+                  onViewDetails={permissions.canViewDetails ? setViewingMulta : undefined}
+                  onEdit={permissions.canEdit ? setEditingMulta : undefined}
+                />
+              )
+            )}
+
             {/* Card de Resumo - Próximo ao Vencimento */}
             {currentView === 'vencimento' && !loading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -832,7 +855,7 @@ function App() {
             )}
 
             {/* Filters and Actions - Show for list views */}
-            {currentView !== 'dashboard' && currentView !== 'kanban' && (
+            {currentView !== 'dashboard' && currentView !== 'kanban' && currentView !== 'grafo' && (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -905,7 +928,7 @@ function App() {
             )}
 
             {/* Multas View - List or Cards */}
-            {currentView !== 'dashboard' && currentView !== 'kanban' && (
+            {currentView !== 'dashboard' && currentView !== 'kanban' && currentView !== 'grafo' && (
               loading ? (
                 <Card>
                   <CardContent className="p-5">

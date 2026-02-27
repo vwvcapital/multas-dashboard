@@ -12,13 +12,14 @@ import {
   UserPlus,
   Columns3,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  GitBranch
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { UserRole } from '@/contexts/AuthContext'
 
-export type ViewType = 'dashboard' | 'kanban' | 'recentes' | 'pendentes' | 'disponiveis' | 'concluidas' | 'vencidas' | 'vencimento' | 'indicacao-vencimento' | 'todas'
+export type ViewType = 'dashboard' | 'kanban' | 'grafo' | 'recentes' | 'pendentes' | 'disponiveis' | 'concluidas' | 'vencidas' | 'vencimento' | 'indicacao-vencimento' | 'todas'
 
 interface SidebarProps {
   className?: string
@@ -46,6 +47,7 @@ export function Sidebar({ className, currentView, onViewChange, userRole: _userR
   const menuItems: { id: ViewType; icon: typeof LayoutDashboard; label: string; count?: number; color?: string; bgColor?: string }[] = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', color: 'text-slate-600', bgColor: 'bg-slate-100' },
     { id: 'kanban', icon: Columns3, label: 'Kanban', color: 'text-violet-600', bgColor: 'bg-violet-50' },
+    { id: 'grafo', icon: GitBranch, label: 'Conexões', color: 'text-pink-600', bgColor: 'bg-pink-50' },
     { id: 'recentes', icon: FilePlus2, label: 'Recentes', count: counts?.recentes, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
     { id: 'pendentes', icon: Clock, label: 'Pendentes', count: counts?.pendentes, color: 'text-amber-600', bgColor: 'bg-amber-50' },
     { id: 'disponiveis', icon: FileCheck, label: 'Disponíveis', count: counts?.disponiveis, color: 'text-blue-600', bgColor: 'bg-blue-50' },
